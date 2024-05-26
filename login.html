@@ -19,15 +19,16 @@
           <h1>facebook</h1>
           <p>Facebook te ayuda a comunicarte y compartir con las personas que forman parte de tu vida.</p>
         </article>
-        <article class="login">
-          <input class="input-login" type="text" placeholder="   Correo electrónico o número de teléfono">
-          <input class="input-login" type="password" placeholder="   Contraseña">
-          <button class="btn btn-sign-up">iniciar sesión</button>
-        </article>
+        
+          <form  class="login">
+            <input id="email" class="input-login" type="text" placeholder="   Correo electrónico" required>
+            <input id="password" class="input-login" type="password" placeholder="   Contraseña" required>
+            <button type="button" id="btn-sign-up" class="btn btn-sign-up">iniciar sesión</button>
+          </form>
       </section>
     </div>
 
-    <section id="posts" class="posts disguise">
+    <section id="page-posts" class="page-posts disguise">
 
       <nav class="menu">
         <div class="menu-user">
@@ -38,6 +39,10 @@
             <h2> nombre de usuario</h2>
           </div>
         </div>
+
+        <textarea class="input-post" name="" id="" rows="3" maxlength="255" placeholder="      ¿Que estas pensando?"></textarea>
+
+
         <div class="btn-options">
           <button id="create-post" class="btn --menu-user">Publicar</button>
           <button id="user-out" class="btn --menu-user user-out">Salir</button>
@@ -367,6 +372,7 @@
       </article>
 
     </section>
+
 
   </main>
 

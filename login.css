@@ -50,7 +50,7 @@
   border: 1px solid #b9b6b6;
 
 }
-.posts {
+.page-posts {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -162,7 +162,9 @@
 .--menu-user{
   margin-left: 10px;
   font-size: 0.8em;
+  width: 100px;
 }
+.--
 .btn-options {
   display: flex;
 }
@@ -176,6 +178,13 @@
 .input-comment {
   width: 90%;
   border-radius: 25px;
+}
+.input-post{
+  text-indent: 30px;
+  justify-items: center;
+  width: 60%;
+  border-radius: 25px;
+  resize: none;
 }
 .post-comment {
   width: 650px;
@@ -198,7 +207,7 @@
   justify-content: space-between;
   position: fixed;
   top: 0;
-  width: 1000px;
+  width: 1280px;
   height: 50px;
   background-color: white;
   border-top: 0.5px solid rgb(235, 232, 232);
@@ -208,3 +217,4 @@
 .menu-user{
   display: flex;
 }
+
