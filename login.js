@@ -61,6 +61,7 @@ let likes = [
     postId: "3",
   },
 ];
+let CountedLikes = 0;
 
 let comments = [
   {
@@ -85,6 +86,7 @@ let comments = [
     date: "25/05/2024 23:20:20",
   },
 ];
+let CountedComment = 0;
 
 let userActive = {};
 
@@ -125,7 +127,6 @@ document.addEventListener("click", (e) => {
     if (userActive.password == password.value) {
       pagePost.classList.toggle("disguise");
       pageLogin.classList.toggle("disguise");
-   
 
       let menu = `<div class="menu-user disguise">
                     <div class="photo-profile">
@@ -164,6 +165,40 @@ document.addEventListener("click", (e) => {
       image: userActive.photo,
     };
     posts.unshift(newPost);
+    generatePostsHtml();
+  }
+
+  if (e.target.matches(".btn-like")) {
+    CountedLikes++;
+    var indice = e.target.dataset.like;
+    let post = posts[indice];
+
+    let newLike = {
+      id: CountedLikes,
+      userId: userActive.userName,
+      postId: post.id,
+    };
+
+    likes.push(newLike);
+    generatePostsHtml();
+  }
+  if (e.target.matches(".btn-comment")) {
+    CountedComment++;
+    var indice = e.target.dataset.comment;
+    let inputComment = document.getElementById("input-comment").value;
+    let now = new Date().toDateString();
+    let post = posts[indice];
+
+    let newComment = {
+      id: CountedLikes,
+      userId: userActive.userName,
+      postId: post.id,
+      text: inputComment.value,
+      image: userActive.photo,
+      date: now,
+    };
+
+    comments.push(newComment);
     generatePostsHtml();
   }
 });
@@ -212,8 +247,8 @@ const generatePostsHtml = (e) => {
     </div>
 
     <footer class="btns-comment">
-      <button class="btn --btn-post">Me gusta</button>
-      <button class="btn --btn-post">Comentar</button>
+      <button data-like="${index}" class="btn --btn-post btn-like">Me gusta</button>
+      <button data-comment="${index}" class="btn --btn-post btn-comment">Comentar</button>
       <button class="btn --btn-post">Compartir</button>
     </footer>
 
@@ -282,7 +317,7 @@ const generatePostsHtml = (e) => {
           <div class="photo-profile">
             <img src=${userActive.photo} alt="">
           </div>
-          <input class="input-comment" type="text" placeholder="     Comentar como userName">
+          <input id="input-comment" class="input-comment" type="text" placeholder="     Comentar como userName">
         </div>
 
       </div>
