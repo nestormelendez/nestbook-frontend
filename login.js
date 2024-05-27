@@ -1,27 +1,24 @@
 let user = [
   {
     id: "1",
-    userNamer: "Nestor",
+    userName: "Nestor",
     email: "melendezinv4321@gmail.com",
     password: "David4321",
-    photo:
-      "https://photos.fife.usercontent.google.com/pw/AP1GczM2lEzu1ZCQvqf2m8a-JFp38-9GrUToRjAaHY_fDhMloYBfXAsRlF41aQ=w739-h739-s-no-gm?authuser=0",
+    photo: "./assets/nestor.jpg",
   },
   {
     id: "2",
-    userNamer: "Leonardo",
+    userName: "Leonardo",
     email: "leonardo@gmail.com",
     password: "David0202",
-    photo:
-      "https://photos.fife.usercontent.google.com/pw/AP1GczO00N6wDtWMTm_sZbwaDvlDG_F60kmKD5JfnGhzjvK75U4G5E8MZV3eyA=w554-h739-s-no-gm?authuser=0",
+    photo: "./assets/leonardo.jpg",
   },
   {
     id: "3",
-    userNamer: "Leonel",
+    userName: "Leonel",
     email: "leonel@gmail.com",
     password: "David3011",
-    photo:
-      "https://photos.fife.usercontent.google.com/pw/AP1GczPETPKxAlFPnKnB5hw8ho7hJCM2GJFw-eDSi7vlqcL96E7UP-mw37xLUw=w985-h739-s-no-gm?authuser=0",
+    photo: "./assets/leonel.jpg",
   },
 ];
 
@@ -45,6 +42,7 @@ let posts = [
     date: "25/05/2024 21:20:20",
   },
 ];
+let CountedPublications = 0;
 
 let likes = [
   {
@@ -91,16 +89,20 @@ let comments = [
 let userActive = {};
 
 let pageLogin = document.getElementById("page-login");
-let pagePost = document.getElementById("page-posts");
+let pagePost = document.getElementById("generate-posts");
+let nav = document.getElementById("menu");
 
-var btnSignUp = document.getElementById("btn-sign-up");
-var password = document.getElementById("password");
-var email = document.getElementById("email");
+let btnSignUp = document.getElementById("btn-sign-up");
+let password = document.getElementById("password");
+let email = document.getElementById("email");
+
+let generatePosts = document.getElementById("generate-posts");
 
 document.addEventListener("click", (e) => {
   if (e.target.matches(".user-out")) {
     pagePost.classList.toggle("disguise");
     pageLogin.classList.toggle("disguise");
+    nav.innerHTML = "";
   }
 
   if (e.target.matches(".btn-sign-up")) {
@@ -112,28 +114,182 @@ document.addEventListener("click", (e) => {
       return false;
     }
     userActive = {};
-    
+
     verifyEmail(user, email.value);
 
-
     if (!userActive.email) {
-      alert("Disculpe el usuario no se encuentra registrado")
-      return
+      alert("Disculpe el usuario no se encuentra registrado");
+      return;
     }
 
     if (userActive.password == password.value) {
       pagePost.classList.toggle("disguise");
       pageLogin.classList.toggle("disguise");
+   
+
+      let menu = `<div class="menu-user disguise">
+                    <div class="photo-profile">
+                      <img src="${userActive.photo}" alt="">
+                    </div>
+                  <h2> ${userActive.userName}</h2>
+                    </div>
+                  </div>
+
+                  <textarea id="input-post" class="input-post" name="" rows="3" maxlength="255" placeholder="      ¿Que estas pensando?"></textarea>
+
+                  <div class="btn-options"> 
+                    <button id="create-post" class="btn --menu-user create-post">Publicar</button>
+                    <button id="user-out" class="btn --menu-user user-out">Salir</button>
+                  </div>`;
+
+      nav.innerHTML = menu;
+      generatePostsHtml();
     } else {
-        alert("disculpe la contraseña no es valida");
+      alert("disculpe la contraseña no es valida");
     }
+  }
+
+  if (e.target.matches(".create-post")) {
+    CountedPublications++;
+
+    let inputPost = document.getElementById("input-post").value;
+
+    let now = new Date().toDateString();
+
+    let newPost = {
+      id: CountedPublications,
+      userId: userActive.userName,
+      text: inputPost,
+      date: now,
+      image: userActive.photo,
+    };
+    posts.unshift(newPost);
+    generatePostsHtml();
   }
 });
 
 function verifyEmail(user, email) {
   for (const usuario of user) {
     if (usuario.email === email) {
-      userActive = usuario
-    } 
+      userActive = usuario;
+    }
   }
 }
+
+const generatePostsHtml = (e) => {
+  let poster = ``;
+  for (let index = 0; index < posts.length; index++) {
+    const element = posts[index];
+
+    poster += ` 
+   
+    
+  
+    <article class="content post">
+    <header class="post-header">
+      <div class="post-header-user">
+        <div class="photo-profile">
+          <img src="${element.image}" alt="">
+        </div>
+        <div class="data-user-post">
+          <h2> ${element.userId}</h2>
+          <h2> ${element.date}</h2>
+        </div>
+      </div>
+      <div class="btn-options">
+        <button class="btn --option">...</button>
+      </div>
+    </header>
+
+    <div class="container  post-content">
+      <span>
+        ${element.text}
+      </span>
+      <div class="post-likes">
+        <h5>❤️ 0</h5>
+        <h5>0 Comentarios</h5>
+      </div>
+    </div>
+
+    <footer class="btns-comment">
+      <button class="btn --btn-post">Me gusta</button>
+      <button class="btn --btn-post">Comentar</button>
+      <button class="btn --btn-post">Compartir</button>
+    </footer>
+
+    <article class="container-comment">
+
+      <div class="post-header-user">
+        <div class="photo-profile">
+          <img src="../" alt="">
+        </div>
+        <div class="data-user-post">
+          <h2> nombre de usuario</h2>
+          <h2> fecha de publicacion</h2>
+        </div>
+        <div class="post-comment">
+          <span>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Libero cumque aspernatur, repudiandae
+            dolor sed hic, temporibus nam esse quia accusamus deleniti. Voluptatum, sunt at optio vero sint
+            asperiores expedita rerum!
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ea id sequi maxime officia eligendi porro
+            placeat, dignissimos iusto quam vero doloremque facere praesentium sed sint. Similique a laborum totam
+            deleniti.
+          </span>
+
+        </div>
+      </div>
+
+      <div class="post-header-user">
+        <div class="photo-profile">
+          <img src="../" alt="">
+        </div>
+        <div class="data-user-post">
+          <h2> nombre de usuario</h2>
+          <h2> fecha de publicacion</h2>
+        </div>
+        <div class="post-comment">
+          <span>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Libero cumque aspernatur, repudiandae
+            dolor sed hic, temporibus nam esse quia accusamus deleniti. Voluptatum, sunt at optio vero sint
+            asperiores expedita rerum!
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ea id sequi maxime officia eligendi porro
+            placeat, dignissimos iusto quam vero doloremque facere praesentium sed sint. Similique a laborum totam
+            deleniti.
+          </span>
+        </div>
+      </div>
+
+      <div class="post-header-user">
+        <div class="photo-profile">
+          <img src="../" alt="">
+        </div>
+        <div class="data-user-post">
+          <h2> nombre de usuario</h2>
+          <h2> fecha de publicacion</h2>
+        </div>
+        <div class="post-comment">
+          <span>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Libero cumque aspernatur, repudiandae
+            dolor sed hic, temporibus nam esse quia accusamus deleniti. Voluptatum, sunt at optio vero sint
+            asperiores expedita rerum!
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ea id sequi maxime officia eligendi porro
+            placeat, dignissimos iusto quam vero doloremque facere praesentium sed sint. Similique a laborum totam
+            deleniti.
+          </span>
+        </div>
+      </div>
+
+      <div>
+        <div class="post-header-user">
+          <div class="photo-profile">
+            <img src=${userActive.photo} alt="">
+          </div>
+          <input class="input-comment" type="text" placeholder="     Comentar como userName">
+        </div>
+
+      </div>
+
+    </article>
+  </article>`;
+  }
+
+  pagePost.innerHTML = poster;
+};
