@@ -23,7 +23,7 @@ let user = [
 ];
 
 let posts = [
-  {
+  /* {
     id: "1",
     userId: "Nestor",
     text: "esto es el primer post",
@@ -40,12 +40,13 @@ let posts = [
     userId: "Leonardo",
     text: "esto es el tercer post",
     date: "25/05/2024 21:20:20",
-  },
+  }, */
 ];
 let CountedPublications = 0;
 
 let likes = [
-  {
+  {},
+  /* {
     id: "1",
     userId: "3",
     postId: "1",
@@ -59,12 +60,13 @@ let likes = [
     id: "3",
     userId: "2",
     postId: "3",
-  },
+  }, */
 ];
 let CountedLikes = 0;
 
 let comments = [
-  {
+  {},
+  /* {
     id: "1",
     userId: "1",
     postId: "2",
@@ -84,7 +86,7 @@ let comments = [
     postId: "3",
     text: "Este comentario es del usuario Leonardo, es el tercer comentario de la tercera publicacion",
     date: "25/05/2024 23:20:20",
-  },
+  }, */
 ];
 let CountedComment = 0;
 
@@ -144,7 +146,11 @@ document.addEventListener("click", (e) => {
                   </div>`;
 
       nav.innerHTML = menu;
-      generatePostsHtml();
+      if (!posts.length == 0) {
+        generatePostsHtml();
+      } else {
+        pagePost.innerHTML = ""
+      }
     } else {
       alert("disculpe la contraseña no es valida");
     }
