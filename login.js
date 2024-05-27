@@ -88,7 +88,7 @@ let comments = [
   },
 ];
 
-let userActive = [{}];
+let userActive = {};
 
 let pageLogin = document.getElementById("page-login");
 let pagePost = document.getElementById("page-posts");
@@ -111,9 +111,17 @@ document.addEventListener("click", (e) => {
       alert("el campo contraseña es obligatorio");
       return false;
     }
-    let = userfound = buscarPassword(user, email.value);
-    console.log(userfound, userfound.password, userfound.email);
-    if (userfound.password == password.value) {
+    userActive = {};
+    
+    verifyEmail(user, email.value);
+
+
+    if (!userActive.email) {
+      alert("Disculpe el usuario no se encuentra registrado")
+      return
+    }
+
+    if (userActive.password == password.value) {
       pagePost.classList.toggle("disguise");
       pageLogin.classList.toggle("disguise");
     } else {
@@ -122,12 +130,10 @@ document.addEventListener("click", (e) => {
   }
 });
 
-function buscarPassword(user, email) {
+function verifyEmail(user, email) {
   for (const usuario of user) {
     if (usuario.email === email) {
-      return usuario;
-    } else {
-      return alert("disculpe el usuario no se encuentran registrado");
-    }
+      userActive = usuario
+    } 
   }
 }
