@@ -42,7 +42,6 @@ let email = document.getElementById("email");
 let generatePosts = document.getElementById("generate-posts");
 
 document.addEventListener("click", (e) => {
-
   if (e.target.matches(".user-out")) {
     pagePost.classList.toggle("disguise");
     pageLogin.classList.toggle("disguise");
@@ -99,7 +98,7 @@ document.addEventListener("click", (e) => {
   if (e.target.matches(".create-post")) {
     CountedPublications++;
     let inputPost = document.getElementById("input-post").value;
-    let now = new Date().toDateString();
+    let now = getTime()
     let newPost = {
       id: CountedPublications,
       userId: userActive.userName,
@@ -135,25 +134,40 @@ document.addEventListener("click", (e) => {
   if (e.target.matches(".btn-comment")) {
     CountedComment++;
     var indice = e.target.dataset.comment;
-    let inputComment = document.getElementById("input-comment").value;
-    let now = new Date().toDateString();
+    let inputComment = document.getElementById(indice);
+    let inputCommentValue = inputComment.value;
+    console.log(inputComment);
+    let now = getTime();
+
     let post = posts[indice];
 
     let newComment = {
       id: CountedLikes,
       userId: userActive.userName,
       postId: post.id,
-      text: inputComment,
+      text: inputCommentValue,
       image: userActive.photo,
       date: now,
     };
 
-    comments.push(newComment);
+    comments.unshift(newComment);
     let cuantosComments = foundComment(comments, post.id);
     console.log(cuantosComments);
     generatePostsHtml();
   }
 });
+
+function getTime() {
+  let date = new Date();
+  let year = date.getFullYear();
+  let month = date.getMonth() + 1; 
+  let day = date.getDate(); 
+  let hh = date.getHours();
+  let mm = date.getMinutes();
+  let ss = date.getSeconds();
+  let now = `${day}/${month}/${year} - ${hh}:${mm}:${ss}`;
+  return now; 
+}
 
 function verifyEmail(user, email) {
   for (const usuario of user) {
@@ -263,7 +277,7 @@ const generatePostsHtml = () => {
           <div class="photo-profile">
             <img src=${userActive.photo} alt="">
           </div>
-          <input id="input-comment" class="input-comment" type="text" placeholder="     Comentar como userName">
+          <input id="${index}" class="input-comment" type="text" placeholder="     Comentar como userName">
         </div>
 
       </div>
