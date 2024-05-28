@@ -211,6 +211,9 @@ document.addEventListener("click", (e) => {
     };
 
     comments.push(newComment);
+    let cuantosComments = foundComment(comments, post.id)
+   console.log(cuantosComments)
+
     generatePostsHtml();
   }
 });
@@ -232,13 +235,21 @@ function foundLikes(likes, postId) {
     }
   } return likeCount
 }
-
+function foundComment(comments, postId) {
+  let commentCount = 0
+  for (const comment of comments) {
+    if (comment.postId === postId) {
+      commentCount++
+    }
+  } return commentCount
+}
 
 const generatePostsHtml = () => {
   let poster = ``;
   for (let index = 0; index < posts.length; index++) {
     const element = posts[index];
     const postLikes = foundLikes(likes, element.id)
+    const postComments = foundComment(comments, element.id)
 
     poster += ` 
    
@@ -266,7 +277,7 @@ const generatePostsHtml = () => {
       </span>
       <div id="post-likes" class="post-likes">
         <h5>❤️ ${postLikes}</h5>
-        <h5>0 Comentarios</h5>
+        <h5>${postComments} Comentarios</h5>
       </div>
     </div>
 
