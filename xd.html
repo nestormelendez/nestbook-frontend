@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+
+
+    <article class="content post">
+        <header class="post-header">
+          <div class="post-header-user">
+            <div class="photo-profile">
+              <img src="${element.image}" alt="">
+            </div>
+            <div class="data-user-post">
+              <h2> ${element.userId}</h2>
+              <h2> ${element.date}</h2>
+            </div>
+          </div>
+          <div class="btn-options">
+            <button class="btn --option">...</button>
+          </div>
+        </header>
+    
+        <div class="container  post-content">
+          <span>
+            ${element.text}
+          </span>
+          <div id="post-likes" class="post-likes">
+            <h5>❤️ 0</h5>
+            <h5>0 Comentarios</h5>
+          </div>
+        </div>
+    
+        <footer class="btns-comment">
+          <button data-like="${index}" class="btn --btn-post btn-like">Me gusta</button>
+          <button data-comment="${index}" class="btn --btn-post btn-comment">Comentar</button>
+          <button class="btn --btn-post">Compartir</button>
+        </footer>
+    
+
+
+
+
+
+
+
+        <article class="container-comment">
+    
+          <div class="post-header-user">
+            <div class="photo-profile">
+              <img src="../" alt="">
+            </div>
+            <div class="data-user-post">
+              <h2> nombre de usuario</h2>
+              <h2> fecha de publicacion</h2>
+            </div>
+            <div class="post-comment">
+              <span>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Libero cumque aspernatur, repudiandae
+                dolor sed hic, temporibus nam esse quia accusamus deleniti. Voluptatum, sunt at optio vero sint
+                asperiores expedita rerum!
+                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ea id sequi maxime officia eligendi porro
+                placeat, dignissimos iusto quam vero doloremque facere praesentium sed sint. Similique a laborum totam
+                deleniti.
+              </span>
+    
+            </div>
+          </div>
+    
+       
+
+
+
+
+
+
+
+    
+          <div>
+            <div class="post-header-user">
+              <div class="photo-profile">
+                <img src=${userActive.photo} alt="">
+              </div>
+              <input id="input-comment" class="input-comment" type="text" placeholder="     Comentar como userName">
+            </div>
+    
+          </div>
+    
+        </article>
+      </article>`;
+</body>
+</html>

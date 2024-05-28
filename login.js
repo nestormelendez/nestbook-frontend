@@ -45,7 +45,6 @@ let posts = [
 let CountedPublications = 0;
 
 let likes = [
-  {},
   /* {
     id: "1",
     userId: "3",
@@ -186,6 +185,13 @@ document.addEventListener("click", (e) => {
     };
 
     likes.push(newLike);
+    let cuantosLikes = foundLikes(likes, post.id)
+    console.log(cuantosLikes)
+    console.log(likes)
+    console.log(post.id)
+    console.log(`<h5>❤️ ${cuantosLikes}</h5>`)
+    console.log(e.target)
+    console.log(e.target.dataset)
     generatePostsHtml();
   }
   if (e.target.matches(".btn-comment")) {
@@ -217,10 +223,22 @@ function verifyEmail(user, email) {
   }
 }
 
-const generatePostsHtml = (e) => {
+
+function foundLikes(likes, postId) {
+  let likeCount = 0
+  for (const like of likes) {
+    if (like.postId === postId) {
+      likeCount++
+    }
+  } return likeCount
+}
+
+
+const generatePostsHtml = () => {
   let poster = ``;
   for (let index = 0; index < posts.length; index++) {
     const element = posts[index];
+    const postLikes = foundLikes(likes, element.id)
 
     poster += ` 
    
@@ -246,8 +264,8 @@ const generatePostsHtml = (e) => {
       <span>
         ${element.text}
       </span>
-      <div class="post-likes">
-        <h5>❤️ 0</h5>
+      <div id="post-likes" class="post-likes">
+        <h5>❤️ ${postLikes}</h5>
         <h5>0 Comentarios</h5>
       </div>
     </div>
