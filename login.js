@@ -22,71 +22,13 @@ let user = [
   },
 ];
 
-let posts = [
-  /* {
-    id: "1",
-    userId: "Nestor",
-    text: "esto es el primer post",
-    date: "25/05/2024 20:20:20",
-  },
-  {
-    id: "2",
-    userId: "Nestor",
-    text: "esto es el segundo post",
-    date: "25/05/2024 20:40:20",
-  },
-  {
-    id: "3",
-    userId: "Leonardo",
-    text: "esto es el tercer post",
-    date: "25/05/2024 21:20:20",
-  }, */
-];
+let posts = [];
 let CountedPublications = 0;
 
-let likes = [
-  /* {
-    id: "1",
-    userId: "3",
-    postId: "1",
-  },
-  {
-    id: "2",
-    userId: "1",
-    postId: "2",
-  },
-  {
-    id: "3",
-    userId: "2",
-    postId: "3",
-  }, */
-];
+let likes = [];
 let CountedLikes = 0;
 
-let comments = [
-  {},
-  /* {
-    id: "1",
-    userId: "1",
-    postId: "2",
-    text: "Este comentario es del usuario Nestor, es el primer comentario de la segunda publicacion",
-    date: "25/05/2024 21:20:20",
-  },
-  {
-    id: "2",
-    userId: "3",
-    postId: "1",
-    text: "Este comentario es del usuario Leonel, es el segundo comentario de la primera publicacion",
-    date: "25/05/2024 22:20:20",
-  },
-  {
-    id: "3",
-    userId: "2",
-    postId: "3",
-    text: "Este comentario es del usuario Leonardo, es el tercer comentario de la tercera publicacion",
-    date: "25/05/2024 23:20:20",
-  }, */
-];
+let comments = [];
 let CountedComment = 0;
 
 let userActive = {};
@@ -94,14 +36,13 @@ let userActive = {};
 let pageLogin = document.getElementById("page-login");
 let pagePost = document.getElementById("generate-posts");
 let nav = document.getElementById("menu");
-
 let btnSignUp = document.getElementById("btn-sign-up");
 let password = document.getElementById("password");
 let email = document.getElementById("email");
-
 let generatePosts = document.getElementById("generate-posts");
 
 document.addEventListener("click", (e) => {
+
   if (e.target.matches(".user-out")) {
     pagePost.classList.toggle("disguise");
     pageLogin.classList.toggle("disguise");
@@ -148,7 +89,7 @@ document.addEventListener("click", (e) => {
       if (!posts.length == 0) {
         generatePostsHtml();
       } else {
-        pagePost.innerHTML = ""
+        pagePost.innerHTML = "";
       }
     } else {
       alert("disculpe la contraseña no es valida");
@@ -157,11 +98,8 @@ document.addEventListener("click", (e) => {
 
   if (e.target.matches(".create-post")) {
     CountedPublications++;
-
     let inputPost = document.getElementById("input-post").value;
-
     let now = new Date().toDateString();
-
     let newPost = {
       id: CountedPublications,
       userId: userActive.userName,
@@ -177,7 +115,6 @@ document.addEventListener("click", (e) => {
     CountedLikes++;
     var indice = e.target.dataset.like;
     let post = posts[indice];
-
     let newLike = {
       id: CountedLikes,
       userId: userActive.userName,
@@ -185,15 +122,16 @@ document.addEventListener("click", (e) => {
     };
 
     likes.push(newLike);
-    let cuantosLikes = foundLikes(likes, post.id)
-    console.log(cuantosLikes)
-    console.log(likes)
-    console.log(post.id)
-    console.log(`<h5>❤️ ${cuantosLikes}</h5>`)
-    console.log(e.target)
-    console.log(e.target.dataset)
+    let cuantosLikes = foundLikes(likes, post.id);
+    console.log(cuantosLikes);
+    console.log(likes);
+    console.log(post.id);
+    console.log(`<h5>❤️ ${cuantosLikes}</h5>`);
+    console.log(e.target);
+    console.log(e.target.dataset);
     generatePostsHtml();
   }
+
   if (e.target.matches(".btn-comment")) {
     CountedComment++;
     var indice = e.target.dataset.comment;
@@ -205,15 +143,14 @@ document.addEventListener("click", (e) => {
       id: CountedLikes,
       userId: userActive.userName,
       postId: post.id,
-      text: inputComment.value,
+      text: inputComment,
       image: userActive.photo,
       date: now,
     };
 
     comments.push(newComment);
-    let cuantosComments = foundComment(comments, post.id)
-   console.log(cuantosComments)
-
+    let cuantosComments = foundComment(comments, post.id);
+    console.log(cuantosComments);
     generatePostsHtml();
   }
 });
@@ -226,35 +163,66 @@ function verifyEmail(user, email) {
   }
 }
 
-
 function foundLikes(likes, postId) {
-  let likeCount = 0
+  let likeCount = 0;
   for (const like of likes) {
     if (like.postId === postId) {
-      likeCount++
+      likeCount++;
     }
-  } return likeCount
+  }
+  return likeCount;
 }
 function foundComment(comments, postId) {
-  let commentCount = 0
+  let commentCount = 0;
   for (const comment of comments) {
     if (comment.postId === postId) {
-      commentCount++
+      commentCount++;
     }
-  } return commentCount
+  }
+  return commentCount;
+}
+
+function makeComment(comments, postId) {
+  let makeComment = ``;
+  let comentario = [];
+
+  for (const comment of comments) {
+    if (comment.postId === postId) {
+      comentario.unshift(comment);
+    }
+  }
+  for (let index = 0; index < comentario.length; index++) {
+    const element = comentario[index];
+    makeComment += `
+         <div class="post-header-user">
+         <div class="photo-profile">
+           <img src=${element.image} alt="">
+         </div>
+         <div class="data-user-post">
+           <h2> ${element.userId}</h2>
+           <h2> ${element.date}</h2>
+         </div>
+         <div class="post-comment">
+           <span>
+           ${element.text}
+           </span>
+ 
+         </div>
+       </div>         
+         `;
+  }
+  return makeComment;
 }
 
 const generatePostsHtml = () => {
   let poster = ``;
   for (let index = 0; index < posts.length; index++) {
     const element = posts[index];
-    const postLikes = foundLikes(likes, element.id)
-    const postComments = foundComment(comments, element.id)
+    const postLikes = foundLikes(likes, element.id);
+    const postComments = foundComment(comments, element.id);
+    const makeComments = makeComment(comments, element.id);
 
     poster += ` 
-   
-    
-  
     <article class="content post">
     <header class="post-header">
       <div class="post-header-user">
@@ -288,65 +256,8 @@ const generatePostsHtml = () => {
     </footer>
 
     <article class="container-comment">
-
-      <div class="post-header-user">
-        <div class="photo-profile">
-          <img src="../" alt="">
-        </div>
-        <div class="data-user-post">
-          <h2> nombre de usuario</h2>
-          <h2> fecha de publicacion</h2>
-        </div>
-        <div class="post-comment">
-          <span>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Libero cumque aspernatur, repudiandae
-            dolor sed hic, temporibus nam esse quia accusamus deleniti. Voluptatum, sunt at optio vero sint
-            asperiores expedita rerum!
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ea id sequi maxime officia eligendi porro
-            placeat, dignissimos iusto quam vero doloremque facere praesentium sed sint. Similique a laborum totam
-            deleniti.
-          </span>
-
-        </div>
-      </div>
-
-      <div class="post-header-user">
-        <div class="photo-profile">
-          <img src="../" alt="">
-        </div>
-        <div class="data-user-post">
-          <h2> nombre de usuario</h2>
-          <h2> fecha de publicacion</h2>
-        </div>
-        <div class="post-comment">
-          <span>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Libero cumque aspernatur, repudiandae
-            dolor sed hic, temporibus nam esse quia accusamus deleniti. Voluptatum, sunt at optio vero sint
-            asperiores expedita rerum!
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ea id sequi maxime officia eligendi porro
-            placeat, dignissimos iusto quam vero doloremque facere praesentium sed sint. Similique a laborum totam
-            deleniti.
-          </span>
-        </div>
-      </div>
-
-      <div class="post-header-user">
-        <div class="photo-profile">
-          <img src="../" alt="">
-        </div>
-        <div class="data-user-post">
-          <h2> nombre de usuario</h2>
-          <h2> fecha de publicacion</h2>
-        </div>
-        <div class="post-comment">
-          <span>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Libero cumque aspernatur, repudiandae
-            dolor sed hic, temporibus nam esse quia accusamus deleniti. Voluptatum, sunt at optio vero sint
-            asperiores expedita rerum!
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ea id sequi maxime officia eligendi porro
-            placeat, dignissimos iusto quam vero doloremque facere praesentium sed sint. Similique a laborum totam
-            deleniti.
-          </span>
-        </div>
-      </div>
-
+      ${makeComments}
+     
       <div>
         <div class="post-header-user">
           <div class="photo-profile">
