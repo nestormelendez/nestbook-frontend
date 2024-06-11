@@ -83,8 +83,8 @@ html{
 }
 .post-header-user {
   display: flex;
-  width: 100%;
-  gap: 15px;
+  width: 97%;
+  gap: 10px;
   margin: 10px;
 }
 .data-user-post {
@@ -95,13 +95,34 @@ html{
   gap: 5px;
   padding-left: 5px;
   padding-top: 10px;
-  width: auto;
+  width: 90%;
 }
 .photo-profile {
   border-radius: 50%;
   width: 50px;
   height: 50px;
 }
+.photo-profile-avatar {
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--color-cancel);
+  color: var(--color-text);
+}
+.photo-profile-avatar-comment {
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--color-cancel);
+  color: var(--color-text);
+}
+
 .photo-profile img {
   border-radius: 50%;
   width: 50px;
@@ -172,11 +193,13 @@ html{
 }
 .--option {
   width: 50px;
+  height: 50px;
+  border-radius: 50%;
   background-color: var(--color-btn);
   color: var(--color-text);
   font-size: 1em;
   font-weight: bold;
-  border: none;
+ 
 }
 .--menu-user {
   margin-left: 10px;
@@ -188,6 +211,12 @@ html{
 }
 .--btn-post {
   width: 100px;
+}
+.--btn-comment {
+  width: 50px;
+  height: 50px;
+  font-size: 0.5em;
+  border-radius: 50%;
 }
 
 .disguise {
@@ -221,7 +250,11 @@ html{
   display: flex;
   flex-flow: column wrap;
   justify-content: left;
-  align-items: center;
+  align-items: center; 
+  word-break: break-word;
+ 
+
+
 }
 .post-comment span {
   display: flex;
@@ -230,6 +263,8 @@ html{
   padding: 5px;
   font-size: 0.8em;
   font-weight: 300;
+  padding-right: 10px;
+ 
 }
 .menu {
   display: flex;
@@ -329,7 +364,7 @@ html{
     order: 1;
   }
   .post-header-user {
-    width: 350px;
+    width: 95%;
   }
   .post-header {
     width: 350px;
@@ -347,7 +382,7 @@ html{
     word-wrap: break-word;
   }
   .input-comment {
-    width: 70%;
+    width: 60%;
   }
   .menu-user h2{
     margin-left: 10px;
