@@ -45,7 +45,8 @@ document.addEventListener("click", (e) => {
   if (e.target.matches(".user-out")) {
     pagePost.classList.toggle("disguise");
     pageLogin.classList.toggle("disguise");
-    nav.innerHTML = "";
+    nav.innerHTML = ""
+    
   }
 
   if (e.target.matches(".btn-sign-up")) {
@@ -69,7 +70,7 @@ document.addEventListener("click", (e) => {
       pagePost.classList.toggle("disguise");
       pageLogin.classList.toggle("disguise");
 
-      let menu = `<div class="menu-user disguise">
+      let menu = `<div class="menu-user">
                     <div class="photo-profile">
                       <img src="${userActive.photo}" alt="">
                     </div>
@@ -77,7 +78,7 @@ document.addEventListener("click", (e) => {
                     </div>
                   </div>
 
-                  <textarea id="input-post" class="input-post" name="" rows="3" maxlength="255" placeholder="      ¿Que estas pensando?"></textarea>
+                  <textarea id="input-post" class="input-post" name="" rows="3" maxlength="255" placeholder="¿Que estas pensando?"></textarea>
 
                   <div class="btn-options"> 
                     <button id="create-post" class="btn --menu-user create-post">Publicar</button>
@@ -85,6 +86,10 @@ document.addEventListener("click", (e) => {
                   </div>`;
 
       nav.innerHTML = menu;
+
+
+
+
       if (!posts.length == 0) {
         generatePostsHtml();
       } else {
@@ -108,6 +113,12 @@ document.addEventListener("click", (e) => {
     };
     posts.unshift(newPost);
     generatePostsHtml();
+
+    document.getElementById("input-post").value = "";
+    
+
+
+    
   }
 
   if (e.target.matches(".btn-like")) {
@@ -122,12 +133,7 @@ document.addEventListener("click", (e) => {
 
     likes.push(newLike);
     let cuantosLikes = foundLikes(likes, post.id);
-    console.log(cuantosLikes);
-    console.log(likes);
-    console.log(post.id);
-    console.log(`<h5>❤️ ${cuantosLikes}</h5>`);
-    console.log(e.target);
-    console.log(e.target.dataset);
+    
     generatePostsHtml();
   }
 
@@ -152,7 +158,6 @@ document.addEventListener("click", (e) => {
 
     comments.unshift(newComment);
     let cuantosComments = foundComment(comments, post.id);
-    console.log(cuantosComments);
     generatePostsHtml();
   }
 });
@@ -272,12 +277,12 @@ const generatePostsHtml = () => {
     <article class="container-comment">
       ${makeComments}
      
-      <div>
+      <div class="post-contentss">
         <div class="post-header-user">
           <div class="photo-profile">
             <img src=${userActive.photo} alt="">
           </div>
-          <input id="${index}" class="input-comment" type="text" placeholder="     Comentar como userName">
+          <input id="${index}" class="input-comment" type="text" placeholder="     Comentar como ${userActive.userName}">
         </div>
 
       </div>

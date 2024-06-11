@@ -1,3 +1,11 @@
+:root {
+  --color-text: rgb(219, 221, 225);
+  --color-background: rgb(36, 37, 38);
+  --color-background-ligth: rgb(60, 60, 60);
+  --color-btn: rgb(0, 132, 255);
+  --color-confirm: #a9e5bb;
+  --color-cancel: #ff0000;
+}
 .main {
   width: 1280px;
   height: auto;
@@ -6,7 +14,11 @@
   flex-flow: column wrap;
   justify-content: center;
   align-items: center;
-  background-color: whitesmoke;
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+html{
+  background-color: var(--color-background);
 }
 
 .container-login {
@@ -25,7 +37,7 @@
   justify-content: space-between;
   align-items: center;
 }
-.post-likes{
+.post-likes {
   display: flex;
   justify-content: space-between;
   width: 80%;
@@ -41,25 +53,26 @@
 }
 .input-login {
   height: 35px;
-  border: 1px solid #ebe8e8;
+  border: 1px solid var(--color-background-ligth);
+  background-color: var(--color-background);
+  color: var(--color-text);
   border-radius: 5px;
-
 }
 .input-login:focus {
-  outline: #2877e6;
-  border: 1px solid #b9b6b6;
-
+  border: 1px solid var(--color-text);
+  background-color: var(--color-background-ligth);
 }
+
 .page-posts {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   margin-top: 60px;
-  
+  width: 900px;
 }
 .content {
-  min-width: 600px;
+  width: 100%;
   min-height: 250px;
   margin: 15px 0;
 }
@@ -98,18 +111,19 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 900px;
 }
 .post-content span {
   margin: 20px;
   width: 80%;
   padding: 20px;
-  border: 0.3px solid #ebe8e8;
+  border: 0.3px solid var(--color-background-ligth);
   border-radius: 5px;
   box-shadow: 5px 5px rgba(0, 0, 0, 0.096);
 }
 
 .post {
-  border: 0.3px solid #ebe8e8;
+  border: 0.3px solid var(--color-background-ligth);
   border-radius: 5px;
   box-shadow: 5px 5px rgba(0, 0, 0, 0.096);
 }
@@ -126,12 +140,13 @@
 }
 .facebook p {
   padding-top: 20px;
-  color: black;
+  color: var(--color-text);
   font-size: 1.5em;
 }
 .login {
   width: 350px;
-  border: 0.3px solid rgb(235, 232, 232);
+  background-color: var(--color-background);
+  border: 0.3px solid var(--color-background-ligth);
   border-radius: 5px;
   box-shadow: 5px 5px rgba(0, 0, 0, 0.096);
   padding: 15px;
@@ -144,32 +159,31 @@
   height: 40px;
   border-radius: 5px;
   background-color: #2877e6;
-  color: white;
+  color: var(--color-text);
   font-size: 1em;
   font-weight: 600;
 }
 .btns-comment {
   display: flex;
   justify-content: space-around;
-  border-top: 0.5px solid rgb(235, 232, 232);
-  border-bottom: 0.5px solid rgb(235, 232, 232);
+  border-top: 0.5px solid var(--color-background-ligth);
+  border-bottom: 0.5px solid var(--color-background-ligth);
   padding: 5px;
 }
 .--option {
   width: 50px;
-  background-color: white;
+  background-color: var(--color-btn);
+  color: var(--color-text);
   font-size: 1em;
   font-weight: bold;
-  color: black;
   border: none;
 }
-.--menu-user{
+.--menu-user {
   margin-left: 10px;
   font-size: 0.8em;
   width: 100px;
 }
-.--
-.btn-options {
+.-- .btn-options {
   display: flex;
 }
 .--btn-post {
@@ -180,15 +194,27 @@
   display: none;
 }
 .input-comment {
+  background-color: var(--color-background);
+  color: var(--color-text);
   width: 90%;
   border-radius: 25px;
 }
-.input-post{
+.input-comment:focus {
+  background-color: var(--color-background-ligth);
+
+}
+.input-post {
+  background-color: var(--color-background);
+  color: var(--color-text);
   text-indent: 30px;
   justify-items: center;
   width: 60%;
   border-radius: 25px;
   resize: none;
+}
+.input-post:focus {
+  background-color: var(--color-background-ligth);
+ 
 }
 .post-comment {
   width: 650px;
@@ -205,7 +231,7 @@
   font-size: 0.8em;
   font-weight: 300;
 }
-.menu{
+.menu {
   display: flex;
   flex-flow: row nowrap;
   justify-content: space-between;
@@ -213,12 +239,129 @@
   top: 0;
   width: 1280px;
   height: 50px;
-  background-color: white;
-  border-top: 0.5px solid rgb(235, 232, 232);
-  border-bottom: 0.5px solid rgb(235, 232, 232);
+  background-color: var(--color-background);
+  border-top: 0.5px solid var(--color-background-ligth);
+  border-bottom: 0.5px solid var(--color-background-ligth);
   padding: 10px;
 }
-.menu-user{
+.menu-user {
   display: flex;
+  orphans: 1;
 }
+
+@media screen and (max-width: 430px) {
+  .main {
+    width: 250px;
+    margin: 0 auto;
+    flex-flow: column wrap;
+    background-color: var(--color-background);
+  }
+  html {
+    width: 375px;
+    min-height: auto;
+  }
+  .container-login {
+    width: 200px;
+    height: 250px;
+    flex-direction: column;
+    margin-top: 160px;
+  }
+  .facebook {
+    width: 250px;
+    height: auto;
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--color-background);
+  }
+  .facebook h1 {
+    font-size: 3.5em;
+  }
+  .facebook p {
+    width: 200px;
+    font-size: 0.8em;
+    padding: 20px 0px;
+  }
+  .btn-sign-up {
+    font-size: 0.8em;
+  }
+  .login {
+    width: 250px;
+  }
+  .menu {
+    width: 360px;
+    height: 110px;
+    border-bottom: 0;
+    flex-flow: row wrap;
+    padding-top: 40px;
+  }
+  .input-post {
+    background-color: var(--color-background-ligth);
+    color: var(--color-text);
+    text-indent: 25px;
+    justify-items: center;
+    width: 90%;
+    border-radius: 10px;
+    resize: none;
+    margin: 0px 20px;
+    order: 3;
+  }
+  .--menu-user {
+    margin: 10px;
+    font-size: 0.8em;
+    width: 90px;
+  }
+  .container {
+    width: 345px;
+    min-height: 150px;
+  }
+  .container-comment {
+    width: 350px;
+  }
+
+  .page-posts {
+    width: 250px;
+    margin-top: 150px;
+  }
+  .btns-comment {
+    width: 340px;
+    order: 1;
+  }
+  .post-header-user {
+    width: 350px;
+  }
+  .post-header {
+    width: 350px;
+  }
+  .post {
+    width: 350px;
+    background-color: var(--color-background);
+  }
+  .content {
+    min-width: 300px;
+    min-height: 250px;
+    margin: 15px 0;
+  }
+  .post-content span {
+    word-wrap: break-word;
+  }
+  .input-comment {
+    width: 70%;
+  }
+  .menu-user h2{
+    margin-left: 10px;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
 
