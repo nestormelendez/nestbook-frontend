@@ -57,7 +57,7 @@ document.addEventListener("click", async (e) => {
   if (e.target.matches(".btn-sign-up")) {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
-    const raw = JSON.stringify({email: email.value, password: password.value,});
+    const raw = JSON.stringify({ email: email.value, password: password.value, });
     const requestOptions = {
       method: "POST",
       headers: myHeaders,
@@ -107,18 +107,30 @@ document.addEventListener("click", async (e) => {
     }
 
 
+    const myHeadersPosts = new Headers();
+    myHeadersPosts.append("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxLCJuYW1lIjoiTmVzdG9yIiwiZW1haWwiOiJuZXN0b3JAbmVzdGJvb2suY29tIiwiY3JlYXRlZEF0IjoiMjAyNC0wNi0xMFQxNDo1MDo0Mi42MTRaIiwidXBkYXRlZEF0IjoiMjAyNC0wNi0xMFQxNDo1MTo0Mi42MTRaIn0sImlhdCI6MTcxODA3MjkzMywiZXhwIjoxNzQ5NjMwNTMzfQ.3_4wyFj461XzJyC38Sv7K67x2jh4f_vvazdez9jq9qA");
 
+    const requestOptionsPosts = {
+      headers: myHeadersPosts,
+    };
 
+    try {
+      const postsList = await fetch("http://localhost:4000/posts", requestOptionsPosts)
+      const postsData = await postsList.json();
+      console.log(postsData)
+      if (postsData.length !== 0) {
+        generatePostsHtml(postsData);
+      } else {
+        pagePost.innerHTML = "";
+      }
 
-
-
-
-    
-    if (!posts.length == 0) {
-      generatePostsHtml();
-    } else {
-      pagePost.innerHTML = "";
+    } catch (error) {
+      
     }
+
+
+
+
   } else {
     /* alert("disculpe la contraseña no es valida"); */
   }
@@ -158,13 +170,19 @@ document.addEventListener("click", async (e) => {
       const respuesta = await fetch("http://localhost:4000/posts", requestOptions)
 
       const postsData = await respuesta.json();
-      console.log(postsData)
+
+  console.log(postsData)
+
+
+
+
+
       generatePostsHtml();
+      
 
       document.getElementById("input-post").value = "";
     }
     catch (error) {
-      console.error(error)
     }
   }
 
@@ -189,7 +207,6 @@ document.addEventListener("click", async (e) => {
     var indice = e.target.dataset.comment;
     let inputComment = document.getElementById(indice);
     let inputCommentValue = inputComment.value;
-    console.log(inputComment);
     let now = getTime();
 
     let post = posts[indice];
@@ -280,10 +297,10 @@ function makeComment(comments, postId) {
   return makeComment;
 }
 
-const generatePostsHtml = () => {
+const generatePostsHtml = (postsData) => {
   let poster = ``;
-  for (let index = 0; index < posts.length; index++) {
-    const element = posts[index];
+  for (let index = 0; index < postsData.length; index++) {
+    const element = postsData[index];
     const postLikes = foundLikes(likes, element.id);
     const postComments = foundComment(comments, element.id);
     const makeComments = makeComment(comments, element.id);
@@ -292,11 +309,11 @@ const generatePostsHtml = () => {
     <header class="post-header">
         <div class="post-header-user">
             <div class="photo-profile-avatar">
-                <span>${element.userId.charAt(0)}</span>
+                <span>${element.user.name.charAt(0)}</span>
             </div>
             <div class="data-user-post">
-                <h2> ${element.userId}</h2>
-                <h2> ${element.date}</h2>
+                <h2> ${element.user.name}</h2>
+                <h2> ${element.createdAt}</h2>
             </div>
             <div class="btn-options">
                 <button class="btn --option">...</button>
@@ -305,7 +322,7 @@ const generatePostsHtml = () => {
     </header>
     <div class="container  post-content">
         <span>
-            ${element.text}
+            ${element.content}
         </span>
         <div id="post-likes" class="post-likes">
             <h5>❤️ ${postLikes}</h5>
