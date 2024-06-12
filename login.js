@@ -50,51 +50,25 @@ document.addEventListener("click", async (e) => {
     pageLogin.classList.toggle("disguise");
     userActive = ""
     nav.innerHTML = ""
-
     localStorage.removeItem("user");
     localStorage.removeItem("token");
-
   }
 
   if (e.target.matches(".btn-sign-up")) {
-
-
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
-
-    const raw = JSON.stringify({
-      email: email.value,
-      password: password.value,
-    });
-
+    const raw = JSON.stringify({email: email.value, password: password.value,});
     const requestOptions = {
       method: "POST",
       headers: myHeaders,
       body: raw,
       redirect: "follow",
     };
-
     try {
-      const response = await fetch(
-        "http://localhost:4000/auth/login",
-        requestOptions
-      );
+      const response = await fetch("http://localhost:4000/auth/login", requestOptions);
       const loginData = await response.json();
-      console.log(
-        "loginData",
-        loginData,
-        "response",
-        response,
-        loginData.user.name.charAt(0)
-      );
 
-      let usersGroup = localStorage.getItem(userStorage);
-      let users = [];
-      if (usersGroup) {
-        users = JSON.parse(usersGroup);
-      }
       let token = loginData.token
-
       let user = {
         id: loginData.user.id,
         name: loginData.user.name,
@@ -103,14 +77,9 @@ document.addEventListener("click", async (e) => {
         updatedAt: loginData.user.updatedAt,
       };
 
-
-      users.push(user);
-
       const activeUser = JSON.stringify(user);
       localStorage.setItem("user", activeUser);
       localStorage.setItem("token", token);
-
-
 
       userActive = user
 
@@ -137,6 +106,14 @@ document.addEventListener("click", async (e) => {
       console.error(error);
     }
 
+
+
+
+
+
+
+
+    
     if (!posts.length == 0) {
       generatePostsHtml();
     } else {
