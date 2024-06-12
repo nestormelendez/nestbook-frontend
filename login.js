@@ -51,6 +51,9 @@ document.addEventListener("click", async (e) => {
     userActive = ""
     nav.innerHTML = ""
 
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+
   }
 
   if (e.target.matches(".btn-sign-up")) {
@@ -90,21 +93,22 @@ document.addEventListener("click", async (e) => {
       if (usersGroup) {
         users = JSON.parse(usersGroup);
       }
+      let token = loginData.token
+
       let user = {
-        token: loginData.token,
-        user: {
-          id: loginData.user.id,
-          name: loginData.user.name,
-          email: loginData.user.email,
-          createdAt: loginData.user.createdAt,
-          updatedAt: loginData.user.updatedAt,
-        },
+        id: loginData.user.id,
+        name: loginData.user.name,
+        email: loginData.user.email,
+        createdAt: loginData.user.createdAt,
+        updatedAt: loginData.user.updatedAt,
       };
+
 
       users.push(user);
 
-      const saveUser = JSON.stringify(users);
-      localStorage.setItem(loginData.user.name, saveUser);
+      const activeUser = JSON.stringify(user);
+      localStorage.setItem("user", activeUser);
+      localStorage.setItem("token", token);
 
 
 
@@ -149,15 +153,42 @@ document.addEventListener("click", async (e) => {
     let now = getTime();
     let newPost = {
       id: CountedPublications,
-      userId: userActive.user.name,
+      userId: userActive.name,
       text: inputPost,
       date: now,
       image: userActive.photo,
     };
     posts.unshift(newPost);
-    generatePostsHtml();
 
-    document.getElementById("input-post").value = "";
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxLCJuYW1lIjoiTmVzdG9yIiwiZW1haWwiOiJuZXN0b3JAbmVzdGJvb2suY29tIiwiY3JlYXRlZEF0IjoiMjAyNC0wNi0xMFQxNDo1MDo0Mi42MTRaIiwidXBkYXRlZEF0IjoiMjAyNC0wNi0xMFQxNDo1MTo0Mi42MTRaIn0sImlhdCI6MTcxODA3MjkzMywiZXhwIjoxNzQ5NjMwNTMzfQ.3_4wyFj461XzJyC38Sv7K67x2jh4f_vvazdez9jq9qA");
+
+    const raw = JSON.stringify({
+      "content": inputPost,
+    });
+
+
+    try {
+
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow"
+      };
+
+      const respuesta = await fetch("http://localhost:4000/posts", requestOptions)
+
+      const postsData = await respuesta.json();
+      console.log(postsData)
+      generatePostsHtml();
+
+      document.getElementById("input-post").value = "";
+    }
+    catch (error) {
+      console.error(error)
+    }
   }
 
   if (e.target.matches(".btn-like")) {
@@ -188,7 +219,7 @@ document.addEventListener("click", async (e) => {
 
     let newComment = {
       id: CountedComment,
-      userId: userActive.user.name,
+      userId: userActive.name,
       postId: post.id,
       text: inputCommentValue,
       image: userActive.photo,
@@ -198,6 +229,7 @@ document.addEventListener("click", async (e) => {
     comments.unshift(newComment);
     let cuantosComments = foundComment(comments, post.id);
     generatePostsHtml();
+
   }
 });
 
@@ -278,59 +310,50 @@ const generatePostsHtml = () => {
     const postLikes = foundLikes(likes, element.id);
     const postComments = foundComment(comments, element.id);
     const makeComments = makeComment(comments, element.id);
-
     poster += ` 
-           <article class="content post">
-               <header class="post-header">
-                     <div class="post-header-user">
-                              <div class="photo-profile-avatar">
-                                     <span>${element.userId.charAt(0)}</span>
-                                     
-   </div>
-           <div class="data-user-post">
-                     <h2> ${element.userId}</h2>
-                               <h2> ${element.date}</h2>
-                                       </div>
-
-
-                                       <div class="btn-options">
-                                               <button class="btn --option">...</button>
-                                                     </div>
- </div>
-                         </header>
-                         
-                             <div class="container  post-content">
-                                   <span>
-                                           ${element.text}
-     </span>
-           <div id="post-likes" class="post-likes">
-                   <h5>❤️ ${postLikes}</h5>
-                           <h5>${postComments} Comentarios</h5>
-                                 </div>
-                                     </div>
-                                     
-                                         <footer class="btns-comment">
-   <button data-like="${index}" class="btn --btn-post btn-like">Me gusta</button>
-         <button data-comment="${index}" class="btn --btn-post btn-comment">Comentar</button>
-               <button class="btn --btn-post">Compartir</button>
-                   </footer>
-                   
-                       <article class="container-comment">
-                             ${makeComments}
-                                  
-      <div class="post-contentss">
+         <article class="content post">
+    <header class="post-header">
         <div class="post-header-user">
-          <div class="photo-profile-avatar">
-            <span>${userActive.user.name.charAt(0)}</span>
-          </div>   
-          <input id="${index}" class="input-comment" type="text" placeholder="     Comentar como ${userActive.user.name}">
-          <button data-comment="${index}" class="btn --btn-comment btn-comment">Comentar</button>    
+            <div class="photo-profile-avatar">
+                <span>${element.userId.charAt(0)}</span>
+            </div>
+            <div class="data-user-post">
+                <h2> ${element.userId}</h2>
+                <h2> ${element.date}</h2>
+            </div>
+            <div class="btn-options">
+                <button class="btn --option">...</button>
+            </div>
         </div>
-      </div>
-                
-                    </article>
-                      </article>`;
+    </header>
+    <div class="container  post-content">
+        <span>
+            ${element.text}
+        </span>
+        <div id="post-likes" class="post-likes">
+            <h5>❤️ ${postLikes}</h5>
+            <h5>${postComments} Comentarios</h5>
+        </div>
+    </div>
+    <footer class="btns-comment">
+        <button data-like="${index}" class="btn --btn-post btn-like">Me gusta</button>
+        <button data-comment="${index}" class="btn --btn-post btn-comment">Comentar</button>
+        <button class="btn --btn-post">Compartir</button>
+    </footer>
+    <article class="container-comment">
+        ${makeComments}
+        <div class="post-contentss">
+            <div class="post-header-user">
+                <div class="photo-profile-avatar">
+                    <span>${userActive.name.charAt(0)}</span>
+                </div>
+                <input id="${index}" class="input-comment" type="text"
+                    placeholder="     Comentar como ${userActive.name}">
+                <button data-comment="${index}" class="btn --btn-comment btn-comment">Comentar</button>
+            </div>
+        </div>
+    </article>
+</article>`;
   }
-
   pagePost.innerHTML = poster;
 };
