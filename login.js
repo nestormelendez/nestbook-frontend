@@ -1,3 +1,5 @@
+
+
 let user = [
   {
     id: "1",
@@ -55,6 +57,7 @@ document.addEventListener("click", async (e) => {
   }
 
   if (e.target.matches(".btn-sign-up")) {
+    let token = ""
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     const raw = JSON.stringify({ email: email.value, password: password.value, });
@@ -68,7 +71,7 @@ document.addEventListener("click", async (e) => {
       const response = await fetch("http://localhost:4000/auth/login", requestOptions);
       const loginData = await response.json();
 
-      let token = loginData.token
+      token = loginData.token
       let user = {
         id: loginData.user.id,
         name: loginData.user.name,
@@ -106,17 +109,16 @@ document.addEventListener("click", async (e) => {
       console.error(error);
     }
 
-
     const myHeadersPosts = new Headers();
-    myHeadersPosts.append("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxLCJuYW1lIjoiTmVzdG9yIiwiZW1haWwiOiJuZXN0b3JAbmVzdGJvb2suY29tIiwiY3JlYXRlZEF0IjoiMjAyNC0wNi0xMFQxNDo1MDo0Mi42MTRaIiwidXBkYXRlZEF0IjoiMjAyNC0wNi0xMFQxNDo1MTo0Mi42MTRaIn0sImlhdCI6MTcxODA3MjkzMywiZXhwIjoxNzQ5NjMwNTMzfQ.3_4wyFj461XzJyC38Sv7K67x2jh4f_vvazdez9jq9qA");
+    myHeadersPosts.append("Authorization", `Bearer ${token}`);
 
     const requestOptionsPosts = {
       headers: myHeadersPosts,
     };
 
     try {
-      const postsList = await fetch("http://localhost:4000/posts", requestOptionsPosts)
-      const postsData = await postsList.json();
+      const newPost = await fetch("http://localhost:4000/posts", requestOptionsPosts)
+      const postsData = await newPost.json();
       console.log(postsData)
       if (postsData.length !== 0) {
         generatePostsHtml(postsData);
@@ -125,64 +127,53 @@ document.addEventListener("click", async (e) => {
       }
 
     } catch (error) {
-      
+
     }
-
-
-
-
   } else {
-    /* alert("disculpe la contraseña no es valida"); */
+
   }
-  // }
+
 
   if (e.target.matches(".create-post")) {
-    CountedPublications++;
     let inputPost = document.getElementById("input-post").value;
-    let now = getTime();
-    let newPost = {
-      id: CountedPublications,
-      userId: userActive.name,
-      text: inputPost,
-      date: now,
-      image: userActive.photo,
-    };
-    posts.unshift(newPost);
-
+    let token = localStorage.getItem("token");
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
-    myHeaders.append("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxLCJuYW1lIjoiTmVzdG9yIiwiZW1haWwiOiJuZXN0b3JAbmVzdGJvb2suY29tIiwiY3JlYXRlZEF0IjoiMjAyNC0wNi0xMFQxNDo1MDo0Mi42MTRaIiwidXBkYXRlZEF0IjoiMjAyNC0wNi0xMFQxNDo1MTo0Mi42MTRaIn0sImlhdCI6MTcxODA3MjkzMywiZXhwIjoxNzQ5NjMwNTMzfQ.3_4wyFj461XzJyC38Sv7K67x2jh4f_vvazdez9jq9qA");
+    myHeaders.append("Authorization", `Bearer ${token}`);
 
     const raw = JSON.stringify({
-      "content": inputPost,
+      "content": `${inputPost}`
     });
 
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow"
+    };
 
     try {
-
-      const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow"
-      };
-
-      const respuesta = await fetch("http://localhost:4000/posts", requestOptions)
-
-      const postsData = await respuesta.json();
-
-  console.log(postsData)
-
-
-
-
-
-      generatePostsHtml();
-      
-
-      document.getElementById("input-post").value = "";
+      const response = await fetch("http://localhost:4000/posts", requestOptions);
+      const loginData = await response.json();
+      console.log(loginData)
+    } catch (error) {
+      console.error(error);
     }
-    catch (error) {
+
+    const myHeadersPosts = new Headers();
+    myHeadersPosts.append("Authorization", `Bearer ${token}`);
+
+    const requestOptionsPosts = { headers: myHeadersPosts, };
+
+    try {
+      const postsList = await fetch("http://localhost:4000/posts", requestOptionsPosts)
+      const postsData = await postsList.json();
+      if (postsData.length !== 0) {
+        generatePostsHtml(postsData);
+      } else {
+        pagePost.innerHTML = "";
+      }
+    } catch (error) {
     }
   }
 
@@ -207,23 +198,58 @@ document.addEventListener("click", async (e) => {
     var indice = e.target.dataset.comment;
     let inputComment = document.getElementById(indice);
     let inputCommentValue = inputComment.value;
-    let now = getTime();
+    let token = localStorage.getItem("token");
 
-    let post = posts[indice];
 
-    let newComment = {
-      id: CountedComment,
-      userId: userActive.name,
-      postId: post.id,
-      text: inputCommentValue,
-      image: userActive.photo,
-      date: now,
+
+
+
+
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", `Bearer ${token}`);
+    console.log({ indice })
+    const raw = JSON.stringify({
+      "text": `${inputCommentValue}`,
+      "postId": parseInt(indice)
+    });
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow"
     };
 
-    comments.unshift(newComment);
-    let cuantosComments = foundComment(comments, post.id);
-    generatePostsHtml();
 
+    try {
+      const response = await fetch("http://localhost:4000/comments", requestOptions);
+      const loginData = await response.json();
+      console.log(loginData)
+    } catch (error) {
+      console.error(error);
+    }
+
+    const myHeadersPosts = new Headers();
+    myHeadersPosts.append("Authorization", `Bearer ${token}`);
+
+    const requestOptionsPosts = {
+      headers: myHeadersPosts,
+    };
+
+    try {
+      const newPost = await fetch("http://localhost:4000/posts", requestOptionsPosts)
+      const postsData = await newPost.json();
+      console.log(postsData)
+      if (postsData.length !== 0) {
+        generatePostsHtml(postsData);
+      } else {
+        pagePost.innerHTML = "";
+      }
+
+    } catch (error) {
+
+    }
   }
 });
 
@@ -266,25 +292,19 @@ function foundComment(comments, postId) {
   return commentCount;
 }
 
-function makeComment(comments, postId) {
+function makeComment(comments) {
   let makeComment = ``;
-  let comentario = [];
 
-  for (const comment of comments) {
-    if (comment.postId === postId) {
-      comentario.unshift(comment);
-    }
-  }
-  for (let index = 0; index < comentario.length; index++) {
-    const element = comentario[index];
+  for (let index = 0; index < comments.length; index++) {
+    const element = comments[index];
     makeComment += `
          <div class="post-header-user">
           <div class="photo-profile-avatar-comment">
-            <span>${element.userId.charAt(0)}</span>
+            <span>${element.user.name[0]}</span>
           </div>   
           <div class="data-user-post">
-           <h2> ${element.userId}</h2>
-           <h2> ${element.date}</h2>
+           <h2> ${element.user.name}</h2>
+           <h2> ${moment(element.createdAt).format("[Publicado el] DD-MM-YYYY [a las] HH:mm")}</h2>
          </div>
          <div class="post-comment">
            <span>
@@ -303,7 +323,8 @@ const generatePostsHtml = (postsData) => {
     const element = postsData[index];
     const postLikes = foundLikes(likes, element.id);
     const postComments = foundComment(comments, element.id);
-    const makeComments = makeComment(comments, element.id);
+    const makeComments = makeComment(element.comments);
+    // const makeComments = "";  
     poster += ` 
          <article class="content post">
     <header class="post-header">
@@ -313,7 +334,7 @@ const generatePostsHtml = (postsData) => {
             </div>
             <div class="data-user-post">
                 <h2> ${element.user.name}</h2>
-                <h2> ${element.createdAt}</h2>
+                <h2> ${moment(element.createdAt).format("[Publicado el] DD-MM-YYYY [a las] HH:mm")}</h2>
             </div>
             <div class="btn-options">
                 <button class="btn --option">...</button>
@@ -330,8 +351,8 @@ const generatePostsHtml = (postsData) => {
         </div>
     </div>
     <footer class="btns-comment">
-        <button data-like="${index}" class="btn --btn-post btn-like">Me gusta</button>
-        <button data-comment="${index}" class="btn --btn-post btn-comment">Comentar</button>
+        <button data-like="${element.id}" class="btn --btn-post btn-like">Me gusta</button>
+        <button data-comment="${element.id}" class="btn --btn-post btn-comment">Comentar</button>
         <button class="btn --btn-post">Compartir</button>
     </footer>
     <article class="container-comment">
@@ -341,9 +362,9 @@ const generatePostsHtml = (postsData) => {
                 <div class="photo-profile-avatar">
                     <span>${userActive.name.charAt(0)}</span>
                 </div>
-                <input id="${index}" class="input-comment" type="text"
+                <input id="${element.id}" class="input-comment" type="text"
                     placeholder="     Comentar como ${userActive.name}">
-                <button data-comment="${index}" class="btn --btn-comment btn-comment">Comentar</button>
+                <button data-comment="${element.id}" class="btn --btn-comment btn-comment">Comentar</button>
             </div>
         </div>
     </article>
