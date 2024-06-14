@@ -27,21 +27,16 @@ async function cambiarTiempo() {
     const newPost = await fetch("http://192.168.0.142:4000/posts", requestOptionsPosts)
     const postsData = await newPost.json();
 
-    console.log(postsData)
     if (postsData.length !== 0) {
-
 
       for (let index = 0; index < postsData.length; index++) {
         const element = postsData[index];
-        // console.log("post",element.id)
         let IdPost = document.getElementById(`time-post-${element.id}`)
         IdPost.innerText = `${moment(element.createdAt).fromNow()}`;
 
         for (let i = 0; i < element.comments.length; i++) {
           const elements = element.comments[i];
           let contador = i + 1
-          console.log("post", elements.postId)
-          console.log("comentario", contador)
           let IdComment = document.getElementById(`post-${elements.postId}-comment-${contador}`)
           IdComment.innerText = `${moment(elements.createdAt).fromNow()}`
 
@@ -131,7 +126,6 @@ document.addEventListener("click", async (e) => {
     try {
       const newPost = await fetch("http://192.168.0.142:4000/posts", requestOptionsPosts)
       const postsData = await newPost.json();
-      console.log(postsData)
       if (postsData.length !== 0) {
         generatePostsHtml(postsData);
         setInterval(() => {
@@ -152,8 +146,6 @@ document.addEventListener("click", async (e) => {
 
   if (e.target.matches(".create-post")) {
     let inputPost = document.getElementById("input-post").value;
-
-
     let token = localStorage.getItem("token");
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -188,11 +180,57 @@ document.addEventListener("click", async (e) => {
       const postsData = await postsList.json();
       if (postsData.length !== 0) {
         generatePostsHtml(postsData);
+        document.getElementById("input-post").value = ""
       } else {
         pagePost.innerHTML = "";
       }
     } catch (error) {
     }
+  }
+
+
+  if (e.target.matches(".delete-post")) {
+
+    let deletePostConfirm = confirm("¿Estas seguro de borrar esta publicacion?")
+    if (deletePostConfirm) {
+      let deletePost = e.target.dataset.delete;
+      let token = localStorage.getItem("token");
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append("Authorization", `Bearer ${token}`);
+
+      const requestOptions = {
+        method: "DELETE",
+        headers: myHeaders,
+        redirect: "follow"
+      };
+
+      try {
+        const response = await fetch(`http://192.168.0.142:4000/posts/${deletePost}`, requestOptions);
+        const message = await response.json();
+        console.log(message, deletePost)
+      } catch (error) {
+        console.error(error);
+      }
+
+      const myHeadersPosts = new Headers();
+      myHeadersPosts.append("Authorization", `Bearer ${token}`);
+
+      const requestOptionsPosts = { headers: myHeadersPosts, };
+
+      try {
+        const postsList = await fetch("http://192.168.0.142:4000/posts", requestOptionsPosts)
+        const postsData = await postsList.json();
+        if (postsData.length !== 0) {
+          generatePostsHtml(postsData);
+        } else {
+          pagePost.innerHTML = "";
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
   }
 
   if (e.target.matches(".btn-like")) {
@@ -332,13 +370,16 @@ function makeComment(comments) {
           </div>   
           <div class="data-user-post">
            <h2> ${element.user.name}</h2>
+           <div class="post-comment">
+              <span>
+              ${element.text}
+              </span>
+            </div>
            <h2 id="post-${element.postId}-comment-${contador}"> ${moment(element.createdAt).fromNow()}</h2>
-         </div>
-         <div class="post-comment">
-           <span>
-           ${element.text}
-           </span>
-         </div>
+           </div>
+            <button data-delete="${element.id}" class="btn --delete-comments">...</button>
+           
+         
        </div>         
          `;
   }
@@ -346,13 +387,15 @@ function makeComment(comments) {
 }
 const generatePostsHtml = (postsData) => {
   let poster = ``;
+  let posterArray = [];
+
   for (let index = 0; index < postsData.length; index++) {
     const element = postsData[index];
     const postLikes = foundLikes(likes, element.id);
     const postComments = foundComment(element.comments, element.id);
     const makeComments = makeComment(element.comments);
     // const makeComments = "";  
-    poster += ` 
+    poster = ` 
          <article id="post-${element.id}" class="content post">
     <header class="post-header">
         <div class="post-header-user">
@@ -363,8 +406,8 @@ const generatePostsHtml = (postsData) => {
                 <h2> ${element.user.name}</h2>
                 <h2 id="time-post-${element.id}"> ${moment(element.createdAt).fromNow()}</h2>
             </div>
-            <div class="btn-options">
-                <button class="btn --option">...</button>
+            <div class="btn-delete">
+                <button data-delete="${element.id}" class="btn delete-post">X</button>
             </div>
         </div>
     </header>
@@ -396,6 +439,7 @@ const generatePostsHtml = (postsData) => {
         </div>
     </article>
 </article>`;
+    posterArray.unshift(poster)
   }
-  pagePost.innerHTML = poster;
+  pagePost.innerHTML = posterArray;
 };

@@ -93,8 +93,7 @@ html{
   justify-content: start;
   align-items: left;
   gap: 5px;
-  padding-left: 5px;
-  padding-top: 10px;
+font-size: 0.8em;
   width: 90%;
 }
 .photo-profile {
@@ -191,7 +190,7 @@ html{
   border-bottom: 0.5px solid var(--color-background-ligth);
   padding: 5px;
 }
-.--option {
+.delete-post {
   width: 50px;
   height: 50px;
   border-radius: 50%;
@@ -218,7 +217,22 @@ html{
   font-size: 0.5em;
   border-radius: 50%;
 }
+.--delete-comments, .delete-post {
+  width: 50px;
+  height: 50px;
+  font-size: 1em;
+  border-radius: 50%;
+  border: none;
+  background-color: transparent;
+}
+.--delete-comments:hover, .delete-post:hover {
+  width: 50px;
+  height: 50px;
+  font-size: 1em;
+  border-radius: 50%;
 
+  background-color: var(--color-background-ligth);
+}
 .disguise {
   display: none;
 }
@@ -246,26 +260,26 @@ html{
  
 }
 .post-comment {
-  width: 650px;
+  width: 100%;
   display: flex;
   flex-flow: column wrap;
   justify-content: left;
   align-items: center; 
   word-break: break-word;
+  
  
-
-
 }
 .post-comment span {
   display: flex;
   justify-content: left;
   align-items: center;
   padding: 5px;
-  font-size: 0.8em;
+  font-size: 1.3em;
   font-weight: 300;
   padding-right: 10px;
- 
+  width: 90%;
 }
+
 .menu {
   display: flex;
   flex-flow: row nowrap;
@@ -364,7 +378,7 @@ html{
     order: 1;
   }
   .post-header-user {
-    width: 95%;
+    width: 93%;
   }
   .post-header {
     width: 350px;
