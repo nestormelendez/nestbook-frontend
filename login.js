@@ -8,6 +8,10 @@ let userStorage = "Users";
 let pageLogin = document.getElementById("page-login");
 let pagePost = document.getElementById("generate-posts");
 let nav = document.getElementById("menu");
+let bubbleContainer = document.getElementById("bubble-container");
+
+
+
 let btnSignUp = document.getElementById("btn-sign-up");
 let password = document.getElementById("password");
 let email = document.getElementById("email");
@@ -57,6 +61,8 @@ document.addEventListener("click", async (e) => {
   if (e.target.matches(".user-out")) {
     pagePost.classList.toggle("disguise");
     pageLogin.classList.toggle("disguise");
+    bubbleContainer.classList.toggle("disguise");
+    nav.classList.toggle("disguise");
     userActive = ""
     nav.innerHTML = ""
     localStorage.removeItem("user");
@@ -95,6 +101,9 @@ document.addEventListener("click", async (e) => {
 
       pagePost.classList.toggle("disguise");
       pageLogin.classList.toggle("disguise");
+      bubbleContainer.classList.toggle("disguise");
+      nav.classList.toggle("disguise");
+
 
       let menu = `<div class="menu-user">
               <div class="photo-profile-avatar">
@@ -115,6 +124,27 @@ document.addEventListener("click", async (e) => {
     } catch (error) {
       console.error(error);
     }
+
+    /*     const myHeadersBubble = new Headers();
+        myHeadersBubble.append("Authorization", `Bearer ${token}`);
+          
+        const requestOptionsBubble = {
+          headers: myHeaders,
+        };
+        try {
+          const responseBubble = await fetch("http://192.168.0.142:4000/users", requestOptionsBubble)
+          const usersData = await responseBubble.json();
+          
+    
+    
+    
+    
+        } catch (error) {
+          console()
+        }
+         */
+
+
 
     const myHeadersPosts = new Headers();
     myHeadersPosts.append("Authorization", `Bearer ${token}`);
@@ -213,7 +243,7 @@ document.addEventListener("click", async (e) => {
         console.error(error);
       }
 
-      const myHeadersComment = new Headers();
+      /* const myHeadersComment = new Headers();
       myHeadersComment.append("Content-Type", "application/json");
       myHeadersComment.append("Authorization", `Bearer ${token}`);
 
@@ -230,7 +260,7 @@ document.addEventListener("click", async (e) => {
       } catch (error) {
         console.error(error);
       }
-
+ */
 
       const myHeadersPosts = new Headers();
       myHeadersPosts.append("Authorization", `Bearer ${token}`);
