@@ -1,36 +1,5 @@
-
-
-let user = [
-  {
-    id: "1",
-    userName: "Nestor",
-    email: "melendezinv4321@gmail.com",
-    password: "David4321",
-    photo: "./assets/nestor.jpg",
-  },
-  {
-    id: "2",
-    userName: "Leonardo",
-    email: "leonardo@gmail.com",
-    password: "David0202",
-    photo: "./assets/leonardo.jpg",
-  },
-  {
-    id: "3",
-    userName: "Leonel",
-    email: "leonel@gmail.com",
-    password: "David3011",
-    photo: "./assets/leonel.jpg",
-  },
-];
-
-let posts = [];
-let CountedPublications = 0;
-
 let likes = [];
 let CountedLikes = 0;
-
-let comments = [];
 let CountedComment = 0;
 
 let userActive = {};
@@ -44,7 +13,50 @@ let password = document.getElementById("password");
 let email = document.getElementById("email");
 let generatePosts = document.getElementById("generate-posts");
 
-/* let userStorage = "users"; */
+
+async function cambiarTiempo() {
+  let token = localStorage.getItem("token");
+  const myHeadersPosts = new Headers();
+  myHeadersPosts.append("Authorization", `Bearer ${token}`);
+
+  const requestOptionsPosts = {
+    headers: myHeadersPosts,
+  };
+
+  try {
+    const newPost = await fetch("http://192.168.0.142:4000/posts", requestOptionsPosts)
+    const postsData = await newPost.json();
+
+    console.log(postsData)
+    if (postsData.length !== 0) {
+
+
+      for (let index = 0; index < postsData.length; index++) {
+        const element = postsData[index];
+        // console.log("post",element.id)
+        let IdPost = document.getElementById(`time-post-${element.id}`)
+        IdPost.innerText = `${moment(element.createdAt).fromNow()}`;
+
+        for (let i = 0; i < element.comments.length; i++) {
+          const elements = element.comments[i];
+          let contador = i + 1
+          console.log("post", elements.postId)
+          console.log("comentario", contador)
+          let IdComment = document.getElementById(`post-${elements.postId}-comment-${contador}`)
+          IdComment.innerText = `${moment(elements.createdAt).fromNow()}`
+
+        }
+
+      }
+
+    } else {
+      pagePost.innerHTML = ``;
+    }
+
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 document.addEventListener("click", async (e) => {
   if (e.target.matches(".user-out")) {
@@ -68,7 +80,7 @@ document.addEventListener("click", async (e) => {
       redirect: "follow",
     };
     try {
-      const response = await fetch("http://localhost:4000/auth/login", requestOptions);
+      const response = await fetch("http://192.168.0.142:4000/auth/login", requestOptions);
       const loginData = await response.json();
 
       token = loginData.token
@@ -117,11 +129,16 @@ document.addEventListener("click", async (e) => {
     };
 
     try {
-      const newPost = await fetch("http://localhost:4000/posts", requestOptionsPosts)
+      const newPost = await fetch("http://192.168.0.142:4000/posts", requestOptionsPosts)
       const postsData = await newPost.json();
       console.log(postsData)
       if (postsData.length !== 0) {
         generatePostsHtml(postsData);
+        setInterval(() => {
+          cambiarTiempo()
+        }, 1000);
+
+
       } else {
         pagePost.innerHTML = "";
       }
@@ -133,9 +150,10 @@ document.addEventListener("click", async (e) => {
 
   }
 
-
   if (e.target.matches(".create-post")) {
     let inputPost = document.getElementById("input-post").value;
+
+
     let token = localStorage.getItem("token");
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -153,7 +171,7 @@ document.addEventListener("click", async (e) => {
     };
 
     try {
-      const response = await fetch("http://localhost:4000/posts", requestOptions);
+      const response = await fetch("http://192.168.0.142:4000/posts", requestOptions);
       const loginData = await response.json();
       console.log(loginData)
     } catch (error) {
@@ -166,7 +184,7 @@ document.addEventListener("click", async (e) => {
     const requestOptionsPosts = { headers: myHeadersPosts, };
 
     try {
-      const postsList = await fetch("http://localhost:4000/posts", requestOptionsPosts)
+      const postsList = await fetch("http://192.168.0.142:4000/posts", requestOptionsPosts)
       const postsData = await postsList.json();
       if (postsData.length !== 0) {
         generatePostsHtml(postsData);
@@ -180,17 +198,53 @@ document.addEventListener("click", async (e) => {
   if (e.target.matches(".btn-like")) {
     CountedLikes++;
     var indice = e.target.dataset.like;
-    let post = posts[indice];
-    let newLike = {
-      id: CountedLikes,
-      userId: userActive.name,
-      postId: post.id,
+    let inputComment = document.getElementById(indice);
+    let inputCommentValue = inputComment.value;
+    let token = localStorage.getItem("token");
+
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", `Bearer ${token}`);
+    console.log({ indice })
+    const raw = JSON.stringify({
+      "postId": parseInt(indice)
+    });
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow"
     };
 
-    likes.push(newLike);
-    let cuantosLikes = foundLikes(likes, post.id);
+    try {
+      const response = await fetch("http://192.168.0.142:4000/likes", requestOptions);
+      const loginData = await response.json();
+      console.log(loginData)
+    } catch (error) {
+      console.error(error);
+    }
 
-    generatePostsHtml();
+    const myHeadersPosts = new Headers();
+    myHeadersPosts.append("Authorization", `Bearer ${token}`);
+
+    const requestOptionsPosts = {
+      headers: myHeadersPosts,
+    };
+
+    try {
+      const newPost = await fetch("http://192.168.0.142:4000/posts", requestOptionsPosts)
+      const postsData = await newPost.json();
+      console.log(postsData)
+      if (postsData.length !== 0) {
+        generatePostsHtml(postsData);
+      } else {
+        pagePost.innerHTML = "";
+      }
+
+    } catch (error) {
+
+    }
   }
 
   if (e.target.matches(".btn-comment")) {
@@ -199,11 +253,6 @@ document.addEventListener("click", async (e) => {
     let inputComment = document.getElementById(indice);
     let inputCommentValue = inputComment.value;
     let token = localStorage.getItem("token");
-
-
-
-
-
 
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -221,9 +270,8 @@ document.addEventListener("click", async (e) => {
       redirect: "follow"
     };
 
-
     try {
-      const response = await fetch("http://localhost:4000/comments", requestOptions);
+      const response = await fetch("http://192.168.0.142:4000/comments", requestOptions);
       const loginData = await response.json();
       console.log(loginData)
     } catch (error) {
@@ -238,7 +286,7 @@ document.addEventListener("click", async (e) => {
     };
 
     try {
-      const newPost = await fetch("http://localhost:4000/posts", requestOptionsPosts)
+      const newPost = await fetch("http://192.168.0.142:4000/posts", requestOptionsPosts)
       const postsData = await newPost.json();
       console.log(postsData)
       if (postsData.length !== 0) {
@@ -252,26 +300,6 @@ document.addEventListener("click", async (e) => {
     }
   }
 });
-
-function getTime() {
-  let date = new Date();
-  let year = date.getFullYear();
-  let month = date.getMonth() + 1;
-  let day = date.getDate();
-  let hh = date.getHours();
-  let mm = date.getMinutes();
-  let ss = date.getSeconds();
-  let now = `${day}/${month}/${year} - ${hh}:${mm}:${ss}`;
-  return now;
-}
-
-function verifyEmail(user, email) {
-  for (const usuario of user) {
-    if (usuario.email === email) {
-      userActive = usuario;
-    }
-  }
-}
 
 function foundLikes(likes, postId) {
   let likeCount = 0;
@@ -291,12 +319,12 @@ function foundComment(comments, postId) {
   }
   return commentCount;
 }
-
 function makeComment(comments) {
   let makeComment = ``;
 
   for (let index = 0; index < comments.length; index++) {
     const element = comments[index];
+    let contador = index + 1;
     makeComment += `
          <div class="post-header-user">
           <div class="photo-profile-avatar-comment">
@@ -304,7 +332,7 @@ function makeComment(comments) {
           </div>   
           <div class="data-user-post">
            <h2> ${element.user.name}</h2>
-           <h2> ${moment(element.createdAt).format("[Publicado el] DD-MM-YYYY [a las] HH:mm")}</h2>
+           <h2 id="post-${element.postId}-comment-${contador}"> ${moment(element.createdAt).fromNow()}</h2>
          </div>
          <div class="post-comment">
            <span>
@@ -316,17 +344,16 @@ function makeComment(comments) {
   }
   return makeComment;
 }
-
 const generatePostsHtml = (postsData) => {
   let poster = ``;
   for (let index = 0; index < postsData.length; index++) {
     const element = postsData[index];
     const postLikes = foundLikes(likes, element.id);
-    const postComments = foundComment(comments, element.id);
+    const postComments = foundComment(element.comments, element.id);
     const makeComments = makeComment(element.comments);
     // const makeComments = "";  
     poster += ` 
-         <article class="content post">
+         <article id="post-${element.id}" class="content post">
     <header class="post-header">
         <div class="post-header-user">
             <div class="photo-profile-avatar">
@@ -334,7 +361,7 @@ const generatePostsHtml = (postsData) => {
             </div>
             <div class="data-user-post">
                 <h2> ${element.user.name}</h2>
-                <h2> ${moment(element.createdAt).format("[Publicado el] DD-MM-YYYY [a las] HH:mm")}</h2>
+                <h2 id="time-post-${element.id}"> ${moment(element.createdAt).fromNow()}</h2>
             </div>
             <div class="btn-options">
                 <button class="btn --option">...</button>
@@ -346,7 +373,7 @@ const generatePostsHtml = (postsData) => {
             ${element.content}
         </span>
         <div id="post-likes" class="post-likes">
-            <h5>❤️ ${postLikes}</h5>
+            <h5>❤️ ${element.likes.length}</h5>
             <h5>${postComments} Comentarios</h5>
         </div>
     </div>
@@ -355,9 +382,9 @@ const generatePostsHtml = (postsData) => {
         <button data-comment="${element.id}" class="btn --btn-post btn-comment">Comentar</button>
         <button class="btn --btn-post">Compartir</button>
     </footer>
-    <article class="container-comment">
+    <article id="container-comment" class="container-comment">
         ${makeComments}
-        <div class="post-contentss">
+        <div class="post-contents">
             <div class="post-header-user">
                 <div class="photo-profile-avatar">
                     <span>${userActive.name.charAt(0)}</span>
