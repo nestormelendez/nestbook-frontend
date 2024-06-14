@@ -232,6 +232,15 @@ document.addEventListener("click", async (e) => {
     }
 
   }
+  if (e.target.matches(".--options-comments")) {
+    let positionPost = e.target.dataset.post
+    let positionComment = e.target.dataset.comment
+    let targetEdit = document.getElementById(`post-${positionPost}-edit-${positionComment}`)
+    let targetDelete = document.getElementById(`post-${positionPost}-delete-${positionComment}`)
+
+    targetEdit.classList.toggle("is-active-btn-edit")
+    targetDelete.classList.toggle("is-active-btn-delete")
+  }
 
   if (e.target.matches(".btn-like")) {
     CountedLikes++;
@@ -377,9 +386,11 @@ function makeComment(comments) {
             </div>
            <h2 id="post-${element.postId}-comment-${contador}"> ${moment(element.createdAt).fromNow()}</h2>
            </div>
-            <button data-delete="${element.id}" class="btn --delete-comments">...</button>
+            <button id="post-${element.postId}-comment-${contador}" data-post="${element.postId}" data-comment="${contador}" class="btn --options-comments">...</button>
            
-         
+            <button id="post-${element.postId}-edit-${contador}" data-edit="${element.id}" class="btn --edit">Edit</button>
+            <button id="post-${element.postId}-delete-${contador}" data-delete="${element.id}" class="btn --delete">Eliminar</button>
+          
        </div>         
          `;
   }

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="post-header-user">
+        <div class="photo-profile-avatar-comment">
+            <span>${element.user.name[0]}</span>
+        </div>
+        <div class="data-user-post">
+            <h2> ${element.user.name}</h2>
+            <div class="post-comment">
+                <span>
+                    ${element.text}
+                </span>
+            </div>
+            <h2 id="post-${element.postId}-comment-${contador}"> ${moment(element.createdAt).fromNow()}</h2>
+        </div>
+        <button data-option="${element.id}" class="btn --options-comments">...</button>
+        <div>
+            <button id="btn-${element.postId}-edit-${contador}" data-edit="${element.id}" class="btn --edit-comments">Editar</button>
+            <button id="btn-${element.postId}-delete-${contador}" data-delete="${element.id}" class="btn --delete-comments">Eliminar</button>
+        </div>
+    </div>
+</body>
+
+</html>

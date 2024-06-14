@@ -17,7 +17,7 @@
   background-color: var(--color-background);
   color: var(--color-text);
 }
-html{
+html {
   background-color: var(--color-background);
 }
 
@@ -86,6 +86,7 @@ html{
   width: 97%;
   gap: 10px;
   margin: 10px;
+  position: relative;
 }
 .data-user-post {
   display: flex;
@@ -93,7 +94,7 @@ html{
   justify-content: start;
   align-items: left;
   gap: 5px;
-font-size: 0.8em;
+  font-size: 0.8em;
   width: 90%;
 }
 .photo-profile {
@@ -183,6 +184,41 @@ font-size: 0.8em;
   font-size: 1em;
   font-weight: 600;
 }
+.--edit {
+  position: absolute;
+  right: 6%;
+  top: 0%;
+  background-color: transparent;
+  width: 80px;
+  height: 30px;
+  font-size: 0.7em;
+  transition: all 1s ease-in-out;
+  opacity: 0;
+
+}
+.--delete {
+  position: absolute;
+  right: 6%;
+  top: 60%;
+  background-color: transparent;
+  width: 80px;
+  height: 30px;
+  font-size: 0.7em;
+  transition: all 1s ease-in-out;
+  opacity: 0;
+}
+.is-active-btn-edit{
+  opacity: 1; 
+  position: absolute;
+  right: 10%;
+  top: 0%;
+}
+.is-active-btn-delete{
+  opacity: 1; 
+  right: 10%;
+  top: 60%;
+}
+
 .btns-comment {
   display: flex;
   justify-content: space-around;
@@ -198,7 +234,6 @@ font-size: 0.8em;
   color: var(--color-text);
   font-size: 1em;
   font-weight: bold;
- 
 }
 .--menu-user {
   margin-left: 10px;
@@ -217,22 +252,96 @@ font-size: 0.8em;
   font-size: 0.5em;
   border-radius: 50%;
 }
-.--delete-comments, .delete-post {
+.--options-comments,
+.delete-post {
   width: 50px;
   height: 50px;
   font-size: 1em;
   border-radius: 50%;
-  border: none;
+  z-index: 99;
+ 
   background-color: transparent;
 }
-.--delete-comments:hover, .delete-post:hover {
+.--options-comments:hover,
+.delete-post:hover {
   width: 50px;
   height: 50px;
   font-size: 1em;
   border-radius: 50%;
-
   background-color: var(--color-background-ligth);
 }
+.--edit-comments {
+  /* display: none; */
+  width: 100px;
+  height: 30px;
+  font-size: 0.8em;
+  top: 50%;
+  right: 15%;
+  border: none;
+  background-color: var(--color-background);
+  position: absolute;
+  transition: all 1s ease-in-out;
+}
+.--delete-comments {
+  /* display: none; */
+  width: 100px;
+  height: 30px;
+  font-size: 0.8em;
+  top: 55%;
+  right: 15%;
+  border: none;
+  background-color: var(--color-background);
+  position: absolute;
+  transition: all 1s ease-in-out;
+
+}
+.--edit-comments-is-active {
+  width: 100px;
+  height: 30px;
+  font-size: 0.8em;
+  border-radius: 50%;
+  top: 50%;
+  right: 20%;
+  border: none;
+  background-color: var(--color-background);
+  position: absolute;
+  transition: all 1s ease-in-out;
+}
+.--delete-comments-is-active {
+  width: 100px;
+  height: 30px;
+  font-size: 0.8em;
+  border-radius: 50%;
+  top: 55%;
+  right: 20%;
+  border: none;
+  background-color: var(--color-background);
+  position: absolute;
+  transition: all 1s ease-in-out;
+}
+/* .--edit-comments:hover {
+  width: 100px;
+  height: 30px;
+  font-size: 0.8em;
+  border-radius: 10px;
+  top: 50%;
+  right: -10%;
+  border: none;
+  background-color: var(--color-background-ligth);
+  position: absolute;
+}
+.--delete-comments:hover {
+  width: 100px;
+  height: 30px;
+  font-size: 0.8em;
+  border-radius: 10px;
+  top: 55%;
+  right: -5%;
+  border: none;
+  background-color: var(--color-background-ligth);
+  position: absolute;
+} */
+
 .disguise {
   display: none;
 }
@@ -244,7 +353,6 @@ font-size: 0.8em;
 }
 .input-comment:focus {
   background-color: var(--color-background-ligth);
-
 }
 .input-post {
   background-color: var(--color-background);
@@ -257,17 +365,14 @@ font-size: 0.8em;
 }
 .input-post:focus {
   background-color: var(--color-background-ligth);
- 
 }
 .post-comment {
   width: 100%;
   display: flex;
   flex-flow: column wrap;
   justify-content: left;
-  align-items: center; 
+  align-items: center;
   word-break: break-word;
-  
- 
 }
 .post-comment span {
   display: flex;
@@ -292,6 +397,7 @@ font-size: 0.8em;
   border-top: 0.5px solid var(--color-background-ligth);
   border-bottom: 0.5px solid var(--color-background-ligth);
   padding: 10px;
+  z-index: 1000;
 }
 .menu-user {
   display: flex;
@@ -379,6 +485,7 @@ font-size: 0.8em;
   }
   .post-header-user {
     width: 93%;
+    position: relative;
   }
   .post-header {
     width: 350px;
@@ -398,19 +505,18 @@ font-size: 0.8em;
   .input-comment {
     width: 60%;
   }
-  .menu-user h2{
+  .menu-user h2 {
     margin-left: 10px;
   }
+  .is-active-btn-edit{
+    opacity: 1; 
+    position: absolute;
+    right: 15%;
+    top: 0%;
+  }
+  .is-active-btn-delete{
+    opacity: 1; 
+    right: 15%;
+    top: 60%;
+  }
 }
-
-
-
-
-
-
-
-
-
-
-
-
