@@ -213,6 +213,25 @@ document.addEventListener("click", async (e) => {
         console.error(error);
       }
 
+      const myHeadersComment = new Headers();
+      myHeadersComment.append("Content-Type", "application/json");
+      myHeadersComment.append("Authorization", `Bearer ${token}`);
+
+      const requestOptionsComment = {
+        method: "DELETE",
+        headers: myHeadersComment,
+        redirect: "follow"
+      };
+
+      try {
+        const responseComment = await fetch(`http://192.168.0.142:4000/comments/${deletePost}`, requestOptionsComment);
+        const messageComment = await responseComment.json();
+        console.log(messageComment, deletePost)
+      } catch (error) {
+        console.error(error);
+      }
+
+
       const myHeadersPosts = new Headers();
       myHeadersPosts.append("Authorization", `Bearer ${token}`);
 

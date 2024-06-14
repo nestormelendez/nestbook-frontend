@@ -188,34 +188,35 @@ html {
   position: absolute;
   right: 6%;
   top: 0%;
-  background-color: transparent;
+  background-color: var(--color-background);
   width: 80px;
   height: 30px;
   font-size: 0.7em;
-  transition: all 1s ease-in-out;
+  transition: all 0.5s ease-in-out;
   opacity: 0;
-
 }
 .--delete {
   position: absolute;
   right: 6%;
   top: 60%;
-  background-color: transparent;
+  background-color: var(--color-background);
   width: 80px;
   height: 30px;
   font-size: 0.7em;
-  transition: all 1s ease-in-out;
   opacity: 0;
+  transition: all 0.5s ease-in-out;
 }
-.is-active-btn-edit{
-  opacity: 1; 
+.is-active-btn-edit {
+  transition: all 0.5s ease-in-out;
+  opacity: 1;
   position: absolute;
-  right: 10%;
+  right: 8%;
   top: 0%;
 }
-.is-active-btn-delete{
-  opacity: 1; 
-  right: 10%;
+.is-active-btn-delete {
+  transition: all 0.5s ease-in-out;
+  opacity: 1;
+  right: 8%;
   top: 60%;
 }
 
@@ -259,8 +260,7 @@ html {
   font-size: 1em;
   border-radius: 50%;
   z-index: 99;
- 
-  background-color: transparent;
+  background-color: var(--color-background-ligth);
 }
 .--options-comments:hover,
 .delete-post:hover {
@@ -271,7 +271,6 @@ html {
   background-color: var(--color-background-ligth);
 }
 .--edit-comments {
-  /* display: none; */
   width: 100px;
   height: 30px;
   font-size: 0.8em;
@@ -283,7 +282,6 @@ html {
   transition: all 1s ease-in-out;
 }
 .--delete-comments {
-  /* display: none; */
   width: 100px;
   height: 30px;
   font-size: 0.8em;
@@ -293,7 +291,6 @@ html {
   background-color: var(--color-background);
   position: absolute;
   transition: all 1s ease-in-out;
-
 }
 .--edit-comments-is-active {
   width: 100px;
@@ -305,7 +302,7 @@ html {
   border: none;
   background-color: var(--color-background);
   position: absolute;
-  transition: all 1s ease-in-out;
+  transition: all 0.5s ease-in-out;
 }
 .--delete-comments-is-active {
   width: 100px;
@@ -317,30 +314,14 @@ html {
   border: none;
   background-color: var(--color-background);
   position: absolute;
-  transition: all 1s ease-in-out;
+  transition: all 0.5s ease-in-out;
 }
-/* .--edit-comments:hover {
-  width: 100px;
-  height: 30px;
-  font-size: 0.8em;
-  border-radius: 10px;
-  top: 50%;
-  right: -10%;
-  border: none;
+.is-active-btn-delete:hover {
   background-color: var(--color-background-ligth);
-  position: absolute;
 }
-.--delete-comments:hover {
-  width: 100px;
-  height: 30px;
-  font-size: 0.8em;
-  border-radius: 10px;
-  top: 55%;
-  right: -5%;
-  border: none;
+.is-active-btn-edit:hover {
   background-color: var(--color-background-ligth);
-  position: absolute;
-} */
+}
 
 .disguise {
   display: none;
@@ -508,14 +489,21 @@ html {
   .menu-user h2 {
     margin-left: 10px;
   }
-  .is-active-btn-edit{
-    opacity: 1; 
-    position: absolute;
+  .--edit {
+    right: 6%;
+    top: 0%;
+  }
+  .--delete {
+    right: 6%;
+    top: 60%;
+  }
+  .is-active-btn-edit {
+    opacity: 1;
     right: 15%;
     top: 0%;
   }
-  .is-active-btn-delete{
-    opacity: 1; 
+  .is-active-btn-delete {
+    opacity: 1;
     right: 15%;
     top: 60%;
   }
