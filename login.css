@@ -381,33 +381,106 @@ html {
   display: flex;
   orphans: 1;
 }
-.--btn-new-chat {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  flex-flow: row wrap;
-  z-index: 100;
-}
-.bubble-container {
-  position: fixed;
-  top: 91%;
-  width: 95%;
-  height: 60px;
-  border-bottom: 0;
-  flex-flow: row wrap;
-  background-color: var(--color-background);
-  z-index: 1100;
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: center;
-  align-items: end;
-  padding: 5px;
-}
+
 .disguise {
   display: none;
 }
+.bubble-container {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: end;
+  position: fixed;
+  top: 92%;
+  width: 1280px;
+  height: 60px;
+  background-color: var(--color-background);
+  border-top: 0.5px solid var(--color-background-ligth);
+  border-bottom: 0.5px solid var(--color-background-ligth);
+  padding: 10px;
+  z-index: 1000;
+}
+.--btn-new-chat{
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  z-index: 1000;
+  background-color: var(--color-btn);
+}
+.bubble-chat{
+  width: auto;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  gap: 10px;
+  margin-right: 10px;
+  position: relative;
+  left: 0%;
+  z-index: -1;
+  transition: all 1.5s;
+  height: 0px;
+  opacity: 1;
+}
+.bubble-chat-is-active {
+  width: auto;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  gap: 10px;
+  margin-right: 10px;
+  position: relative;
+  left: 10%;
+  transition: all 1.5s;
+  height: auto;
+  opacity: 0;
+}
+.bubble-contact {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  background-color: var(--color-cancel);
+  color: var(--color-text);
+}
+/* .--btn-new-chat {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  z-index: 1000;
+  position: fixed;
+  top: 90%;
+  right: 10%;
+  background-color: red;
+}
+.bubble-container {
+  position: relative;
+  top: 100%;
+  z-index: -1;
+  transition: all 1.5s;
+  height: 0px;
+  opacity: 0;
+}
+.bubble-container-is-active {
+  position: relative;
+  transition: all 1.5s;
+  height: auto;
+  opacity: 1;
+}
 
+.bubble-contact{
+  background-color: red;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  z-index: 1000;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+}
 
+ */
 @media screen and (max-width: 430px) {
   .main {
     width: 250px;
@@ -455,39 +528,85 @@ html {
     flex-flow: row wrap;
     padding-top: 40px;
   }
-  .--btn-new-chat {
-    
+
+  .bubble-container {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: start;
+    position: fixed;
+    top: 89%;
+    right: 4%;
+    width: 90%;
+    height: 60px;
+    padding-right: 50px;
+    overflow-x: auto;
+    background-color: var(--color-background);
+    border-top: 0.5px solid var(--color-background-ligth);
+    border-bottom: 0.5px solid var(--color-background-ligth);
+    padding: 10px;
+    z-index: 1000;
+  }
+ 
+  .--btn-new-chat{
+    position: fixed;
+    top: 82%;
+    right: 5%;
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    flex-flow: row wrap;
-    z-index: 100;
+    z-index: 1000;
+    background-color: var(--color-btn);
+    transition: all 0.5s ease-in-out;
   }
-  .bubble-container {
+  .btn-new-chat-cancel {
     position: fixed;
-    top: 90%;
-    width: 360px;
-    height: 60px;
-    border-bottom: 0;
-    flex-flow: row wrap;
-    background-color: var(--color-background);
-    z-index: 1100;
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: center;
-    align-items: end;
-    padding: 5px;
+    top: 91%;
+    right: 5%;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    z-index: 1000;
+    background-color: var(--color-cancel);
+    transition: all 0.5s ease-in-out;
+
   }
-  .input-post {
-    background-color: var(--color-background-ligth);
+  .bubble-chat{
+    width: 300px;
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: space-between;
+    gap: 10px;
+    margin-right: 10px;
+    position: relative;
+    right: 0%;
+    z-index: -1;
+    transition: all 1.5s;
+    height: 0px;
+    opacity: 1;
+  }
+  .bubble-chat-is-active {
+    width: auto;
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: space-between;
+    gap: 10px;
+    margin-right: 10px;
+    position: relative;
+    right: 20%;
+    transition: all 1.5s;
+    height: auto;
+    opacity: 0;
+  }
+  .bubble-contact {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    background-color: var(--color-cancel);
     color: var(--color-text);
-    text-indent: 25px;
-    justify-items: center;
-    width: 90%;
-    border-radius: 10px;
-    resize: none;
-    margin: 0px 20px;
-    order: 3;
   }
   .--menu-user {
     margin: 10px;

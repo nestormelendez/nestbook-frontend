@@ -1,7 +1,7 @@
 let likes = [];
 let CountedLikes = 0;
 let CountedComment = 0;
-
+const API_URL = "http://192.168.0.142:4000"
 let userActive = {};
 let userStorage = "Users";
 
@@ -9,7 +9,7 @@ let pageLogin = document.getElementById("page-login");
 let pagePost = document.getElementById("generate-posts");
 let nav = document.getElementById("menu");
 let bubbleContainer = document.getElementById("bubble-container");
-
+let bubbleChat = document.getElementById("bubble-chat-container");
 
 
 let btnSignUp = document.getElementById("btn-sign-up");
@@ -28,7 +28,7 @@ async function cambiarTiempo() {
   };
 
   try {
-    const newPost = await fetch("http://192.168.0.142:4000/posts", requestOptionsPosts)
+    const newPost = await fetch(`${API_URL}/posts`, requestOptionsPosts)
     const postsData = await newPost.json();
 
     if (postsData.length !== 0) {
@@ -81,7 +81,7 @@ document.addEventListener("click", async (e) => {
       redirect: "follow",
     };
     try {
-      const response = await fetch("http://192.168.0.142:4000/auth/login", requestOptions);
+      const response = await fetch(`${API_URL}/auth/login`, requestOptions);
       const loginData = await response.json();
 
       token = loginData.token
@@ -125,24 +125,38 @@ document.addEventListener("click", async (e) => {
       console.error(error);
     }
 
-    /*     const myHeadersBubble = new Headers();
-        myHeadersBubble.append("Authorization", `Bearer ${token}`);
-          
-        const requestOptionsBubble = {
-          headers: myHeaders,
-        };
-        try {
-          const responseBubble = await fetch("http://192.168.0.142:4000/users", requestOptionsBubble)
-          const usersData = await responseBubble.json();
-          
-    
-    
-    
-    
-        } catch (error) {
-          console()
+    const myHeadersBubble = new Headers();
+    myHeadersBubble.append("Authorization", `Bearer ${token}`);
+
+    const requestOptionsBubble = {
+      headers: myHeadersBubble,
+    };
+    try {
+      const responseBubble = await fetch(`${API_URL}/users`, requestOptionsBubble)
+      const usersData = await responseBubble.json();
+      let bubble = ""
+
+      for (let index = 0; index < usersData.length; index++) {
+        const element = usersData[index];
+        if (element.name !== userActive.name) {
+          bubble += `
+      <div id="bubble-${element.id}" class="bubble-contact">
+        <div id="conectado-${element.id}"> </div>
+        <button class="bubble-contact">${element.name[0]}</button>
+        <span id="notification-${element.id}"> </span>
+      </div>  
+            `;
+          console.log(element.id)
+          console.log(element.name)
+          console.log(element.name[0])
         }
-         */
+      }
+      bubbleChat.innerHTML = bubble;
+
+
+    } catch (error) {
+      console.log(error)
+    }
 
 
 
@@ -154,7 +168,7 @@ document.addEventListener("click", async (e) => {
     };
 
     try {
-      const newPost = await fetch("http://192.168.0.142:4000/posts", requestOptionsPosts)
+      const newPost = await fetch(`${API_URL}/posts`, requestOptionsPosts)
       const postsData = await newPost.json();
       if (postsData.length !== 0) {
         generatePostsHtml(postsData);
@@ -193,7 +207,7 @@ document.addEventListener("click", async (e) => {
     };
 
     try {
-      const response = await fetch("http://192.168.0.142:4000/posts", requestOptions);
+      const response = await fetch(`${API_URL}/posts`, requestOptions);
       const loginData = await response.json();
       console.log(loginData)
     } catch (error) {
@@ -206,7 +220,7 @@ document.addEventListener("click", async (e) => {
     const requestOptionsPosts = { headers: myHeadersPosts, };
 
     try {
-      const postsList = await fetch("http://192.168.0.142:4000/posts", requestOptionsPosts)
+      const postsList = await fetch(`API_URL/posts`, requestOptionsPosts)
       const postsData = await postsList.json();
       if (postsData.length !== 0) {
         generatePostsHtml(postsData);
@@ -236,39 +250,21 @@ document.addEventListener("click", async (e) => {
       };
 
       try {
-        const response = await fetch(`http://192.168.0.142:4000/posts/${deletePost}`, requestOptions);
+        const response = await fetch(`${API_URL}/posts/${deletePost}`, requestOptions);
         const message = await response.json();
         console.log(message, deletePost)
       } catch (error) {
         console.error(error);
       }
 
-      /* const myHeadersComment = new Headers();
-      myHeadersComment.append("Content-Type", "application/json");
-      myHeadersComment.append("Authorization", `Bearer ${token}`);
-
-      const requestOptionsComment = {
-        method: "DELETE",
-        headers: myHeadersComment,
-        redirect: "follow"
-      };
-
-      try {
-        const responseComment = await fetch(`http://192.168.0.142:4000/comments/${deletePost}`, requestOptionsComment);
-        const messageComment = await responseComment.json();
-        console.log(messageComment, deletePost)
-      } catch (error) {
-        console.error(error);
-      }
- */
-
+  
       const myHeadersPosts = new Headers();
       myHeadersPosts.append("Authorization", `Bearer ${token}`);
 
       const requestOptionsPosts = { headers: myHeadersPosts, };
 
       try {
-        const postsList = await fetch("http://192.168.0.142:4000/posts", requestOptionsPosts)
+        const postsList = await fetch(`${API_URL}/posts`, requestOptionsPosts)
         const postsData = await postsList.json();
         if (postsData.length !== 0) {
           generatePostsHtml(postsData);
@@ -314,7 +310,7 @@ document.addEventListener("click", async (e) => {
     };
 
     try {
-      const response = await fetch("http://192.168.0.142:4000/likes", requestOptions);
+      const response = await fetch(`${API_URL}/likes`, requestOptions);
       const loginData = await response.json();
       console.log(loginData)
     } catch (error) {
@@ -329,7 +325,7 @@ document.addEventListener("click", async (e) => {
     };
 
     try {
-      const newPost = await fetch("http://192.168.0.142:4000/posts", requestOptionsPosts)
+      const newPost = await fetch(`${API_URL}/posts`, requestOptionsPosts)
       const postsData = await newPost.json();
       console.log(postsData)
       if (postsData.length !== 0) {
@@ -367,7 +363,7 @@ document.addEventListener("click", async (e) => {
     };
 
     try {
-      const response = await fetch("http://192.168.0.142:4000/comments", requestOptions);
+      const response = await fetch(`${API_URL}/comments`, requestOptions);
       const loginData = await response.json();
       console.log(loginData)
     } catch (error) {
@@ -382,7 +378,7 @@ document.addEventListener("click", async (e) => {
     };
 
     try {
-      const newPost = await fetch("http://192.168.0.142:4000/posts", requestOptionsPosts)
+      const newPost = await fetch(`${API_URL}/posts`, requestOptionsPosts)
       const postsData = await newPost.json();
       console.log(postsData)
       if (postsData.length !== 0) {
@@ -394,6 +390,10 @@ document.addEventListener("click", async (e) => {
     } catch (error) {
 
     }
+  }
+  if (e.target.matches(".--btn-new-chat")) {
+    bubbleChat.classList.toggle("bubble-chat-is-active")
+    e.target.classList.toggle("btn-new-chat-cancel")
   }
 });
 
