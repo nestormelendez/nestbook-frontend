@@ -549,7 +549,7 @@ html {
  
   .--btn-new-chat{
     position: fixed;
-    top: 82%;
+    top: 91%;
     right: 5%;
     width: 50px;
     height: 50px;
@@ -560,7 +560,7 @@ html {
   }
   .btn-new-chat-cancel {
     position: fixed;
-    top: 91%;
+    top: 82%;
     right: 5%;
     width: 50px;
     height: 50px;
@@ -568,6 +568,7 @@ html {
     z-index: 1000;
     background-color: var(--color-cancel);
     transition: all 0.5s ease-in-out;
+    transform: rotate(45deg);
 
   }
   .bubble-chat{
