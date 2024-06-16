@@ -4,59 +4,72 @@ let CountedComment = 0;
 const API_URL = "http://192.168.0.142:4000"
 let userActive = {};
 let userStorage = "Users";
-
 let pageLogin = document.getElementById("page-login");
 let pagePost = document.getElementById("generate-posts");
 let nav = document.getElementById("menu");
 let bubbleContainer = document.getElementById("bubble-container");
 let bubbleChat = document.getElementById("bubble-chat-container");
-
-
 let btnSignUp = document.getElementById("btn-sign-up");
 let password = document.getElementById("password");
 let email = document.getElementById("email");
 let generatePosts = document.getElementById("generate-posts");
 
+let chatContactsContainer = document.getElementById("chat-contacts-container");
+let chat = ""
+let modalBackground = document.getElementById("modal-background");
+
+const ws = new WebSocket('ws://192.168.0.142:4000');
+
+
+async function connectedUsers() {
+  ws.onmessage = (event) => {
+    let usersActive = (JSON.parse(event.data));
+    console.log(JSON.parse(event.data))
+    console.log(usersActive)
+    for (let index = 0; index < usersActive.users.length; index++) {
+      const element = usersActive.users[index];
+      console.log(element)
+      if (element.name !== userActive.name) {
+        let position = document.getElementById(`conectado-${element.id}`)
+        position.classList.toggle("contectado")
+      }
+    }
+  };  
+}
+
+
 
 async function cambiarTiempo() {
   let token = localStorage.getItem("token");
+
   const myHeadersPosts = new Headers();
   myHeadersPosts.append("Authorization", `Bearer ${token}`);
-
   const requestOptionsPosts = {
     headers: myHeadersPosts,
   };
-
   try {
     const newPost = await fetch(`${API_URL}/posts`, requestOptionsPosts)
     const postsData = await newPost.json();
-
     if (postsData.length !== 0) {
-
       for (let index = 0; index < postsData.length; index++) {
         const element = postsData[index];
         let IdPost = document.getElementById(`time-post-${element.id}`)
         IdPost.innerText = `${moment(element.createdAt).fromNow()}`;
-
         for (let i = 0; i < element.comments.length; i++) {
           const elements = element.comments[i];
           let contador = i + 1
           let IdComment = document.getElementById(`post-${elements.postId}-comment-${contador}`)
           IdComment.innerText = `${moment(elements.createdAt).fromNow()}`
-
         }
-
       }
 
     } else {
       pagePost.innerHTML = ``;
     }
-
   } catch (error) {
     console.log(error)
   }
 }
-
 document.addEventListener("click", async (e) => {
   if (e.target.matches(".user-out")) {
     pagePost.classList.toggle("disguise");
@@ -67,8 +80,14 @@ document.addEventListener("click", async (e) => {
     nav.innerHTML = ""
     localStorage.removeItem("user");
     localStorage.removeItem("token");
-  }
+    let token = localStorage.getItem("token");
+    const objToSend = {
+      type: "connected-users",
+      token,
+    }
 
+    ws.send(JSON.stringify(objToSend))
+  }
   if (e.target.matches(".btn-sign-up")) {
     let token = ""
     const myHeaders = new Headers();
@@ -83,7 +102,6 @@ document.addEventListener("click", async (e) => {
     try {
       const response = await fetch(`${API_URL}/auth/login`, requestOptions);
       const loginData = await response.json();
-
       token = loginData.token
       let user = {
         id: loginData.user.id,
@@ -92,19 +110,14 @@ document.addEventListener("click", async (e) => {
         createdAt: loginData.user.createdAt,
         updatedAt: loginData.user.updatedAt,
       };
-
       const activeUser = JSON.stringify(user);
       localStorage.setItem("user", activeUser);
       localStorage.setItem("token", token);
-
       userActive = user
-
       pagePost.classList.toggle("disguise");
       pageLogin.classList.toggle("disguise");
       bubbleContainer.classList.toggle("disguise");
       nav.classList.toggle("disguise");
-
-
       let menu = `<div class="menu-user">
               <div class="photo-profile-avatar">
                 <span>${loginData.user.name.charAt(0)}</span>
@@ -120,14 +133,19 @@ document.addEventListener("click", async (e) => {
                 <button id="user-out" class="btn --menu-user user-out">Salir</button>
               </div>`;
 
+      const objToSend = {
+        type: "connected-users",
+        token,
+      }
+      ws.send(JSON.stringify(objToSend))
+
+
       nav.innerHTML = menu;
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
-
     const myHeadersBubble = new Headers();
     myHeadersBubble.append("Authorization", `Bearer ${token}`);
-
     const requestOptionsBubble = {
       headers: myHeadersBubble,
     };
@@ -135,14 +153,13 @@ document.addEventListener("click", async (e) => {
       const responseBubble = await fetch(`${API_URL}/users`, requestOptionsBubble)
       const usersData = await responseBubble.json();
       let bubble = ""
-
       for (let index = 0; index < usersData.length; index++) {
         const element = usersData[index];
         if (element.name !== userActive.name) {
           bubble += `
       <div id="bubble-${element.id}" class="bubble-contact">
         <div id="conectado-${element.id}"> </div>
-        <button class="bubble-contact">${element.name[0]}</button>
+        <button data-contact="${element.id}" class="bubble-contact">${element.name[0]}</button>
         <span id="notification-${element.id}"> </span>
       </div>  
             `;
@@ -152,87 +169,69 @@ document.addEventListener("click", async (e) => {
         }
       }
       bubbleChat.innerHTML = bubble;
-
-
     } catch (error) {
       console.log(error)
     }
-
-
-
     const myHeadersPosts = new Headers();
     myHeadersPosts.append("Authorization", `Bearer ${token}`);
-
     const requestOptionsPosts = {
       headers: myHeadersPosts,
     };
-
     try {
       const newPost = await fetch(`${API_URL}/posts`, requestOptionsPosts)
       const postsData = await newPost.json();
       if (postsData.length !== 0) {
         generatePostsHtml(postsData);
         setInterval(() => {
-          cambiarTiempo()
+          cambiarTiempo();
+          connectedUsers()
         }, 1000);
-
 
       } else {
         pagePost.innerHTML = "";
       }
-
     } catch (error) {
-
+      console.log(error)
     }
-  } else {
-
   }
-
   if (e.target.matches(".create-post")) {
     let inputPost = document.getElementById("input-post").value;
     let token = localStorage.getItem("token");
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", `Bearer ${token}`);
-
     const raw = JSON.stringify({
       "content": `${inputPost}`
     });
-
     const requestOptions = {
       method: "POST",
       headers: myHeaders,
       body: raw,
       redirect: "follow"
     };
-
     try {
       const response = await fetch(`${API_URL}/posts`, requestOptions);
       const loginData = await response.json();
       console.log(loginData)
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
-
     const myHeadersPosts = new Headers();
     myHeadersPosts.append("Authorization", `Bearer ${token}`);
-
     const requestOptionsPosts = { headers: myHeadersPosts, };
-
     try {
-      const postsList = await fetch(`API_URL/posts`, requestOptionsPosts)
+      const postsList = await fetch(`${API_URL}/posts`, requestOptionsPosts)
       const postsData = await postsList.json();
       if (postsData.length !== 0) {
         generatePostsHtml(postsData);
         document.getElementById("input-post").value = ""
+        window.scrollTo({ behavior: "smooth", top: 0 });
       } else {
         pagePost.innerHTML = "";
       }
     } catch (error) {
     }
   }
-
-
   if (e.target.matches(".delete-post")) {
 
     let deletePostConfirm = confirm("¿Estas seguro de borrar esta publicacion?")
@@ -254,10 +253,10 @@ document.addEventListener("click", async (e) => {
         const message = await response.json();
         console.log(message, deletePost)
       } catch (error) {
-        console.error(error);
+        console.log(error);
       }
 
-  
+
       const myHeadersPosts = new Headers();
       myHeadersPosts.append("Authorization", `Bearer ${token}`);
 
@@ -277,23 +276,97 @@ document.addEventListener("click", async (e) => {
     }
 
   }
+  if (e.target.matches(".delete-comment")) {
+    let deletePostConfirm = confirm("¿Estas seguro de borrar este comentario?")
+    if (deletePostConfirm) {
+      let commentIdDelete = e.target.dataset.deleteId;
+      console.log(commentIdDelete)
+      let token = localStorage.getItem("token");
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append("Authorization", `Bearer ${token}`);
+      const requestOptions = {
+        method: "DELETE",
+        headers: myHeaders,
+        redirect: "follow"
+      };
+      try {
+        const response = await fetch(`${API_URL}/comments/${commentIdDelete}`, requestOptions);
+        const message = await response.json();
+      } catch (error) {
+        console.log(error);
+      }
+      const myHeadersPosts = new Headers();
+      myHeadersPosts.append("Authorization", `Bearer ${token}`);
+      const requestOptionsPosts = { headers: myHeadersPosts, };
+      try {
+        const postsList = await fetch(`${API_URL}/posts`, requestOptionsPosts)
+        const postsData = await postsList.json();
+        if (postsData.length !== 0) {
+          generatePostsHtml(postsData);
+        } else {
+          pagePost.innerHTML = "";
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  }
+  if (e.target.matches(".edit-comment")) {
+    let editPostPrompt = prompt("Editar mensaje")
+    if (editPostPrompt) {
+      let commentIdEdit = e.target.dataset.editId;
+      console.log(commentIdEdit)
+      let token = localStorage.getItem("token");
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append("Authorization", `Bearer ${token}`);
+      const raw = JSON.stringify({
+        "text": editPostPrompt
+      });
+      const requestOptions = {
+        method: "PUT",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow"
+      };
+      try {
+        const response = await fetch(`${API_URL}/comments/${commentIdEdit}`, requestOptions);
+        const message = await response.json();
+      } catch (error) {
+        console.log(error);
+      }
+      const myHeadersPosts = new Headers();
+      myHeadersPosts.append("Authorization", `Bearer ${token}`);
+      const requestOptionsPosts = { headers: myHeadersPosts, };
+      try {
+        const postsList = await fetch(`${API_URL}/posts`, requestOptionsPosts)
+        const postsData = await postsList.json();
+        if (postsData.length !== 0) {
+          generatePostsHtml(postsData);
+        } else {
+          pagePost.innerHTML = "";
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+  }
   if (e.target.matches(".--options-comments")) {
     let positionPost = e.target.dataset.post
     let positionComment = e.target.dataset.comment
     let targetEdit = document.getElementById(`post-${positionPost}-edit-${positionComment}`)
     let targetDelete = document.getElementById(`post-${positionPost}-delete-${positionComment}`)
-
     targetEdit.classList.toggle("is-active-btn-edit")
     targetDelete.classList.toggle("is-active-btn-delete")
   }
-
   if (e.target.matches(".btn-like")) {
     CountedLikes++;
     var indice = e.target.dataset.like;
     let inputComment = document.getElementById(indice);
     let inputCommentValue = inputComment.value;
     let token = localStorage.getItem("token");
-
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", `Bearer ${token}`);
@@ -301,14 +374,12 @@ document.addEventListener("click", async (e) => {
     const raw = JSON.stringify({
       "postId": parseInt(indice)
     });
-
     const requestOptions = {
       method: "POST",
       headers: myHeaders,
       body: raw,
       redirect: "follow"
     };
-
     try {
       const response = await fetch(`${API_URL}/likes`, requestOptions);
       const loginData = await response.json();
@@ -316,14 +387,12 @@ document.addEventListener("click", async (e) => {
     } catch (error) {
       console.error(error);
     }
-
     const myHeadersPosts = new Headers();
     myHeadersPosts.append("Authorization", `Bearer ${token}`);
 
     const requestOptionsPosts = {
       headers: myHeadersPosts,
     };
-
     try {
       const newPost = await fetch(`${API_URL}/posts`, requestOptionsPosts)
       const postsData = await newPost.json();
@@ -333,19 +402,16 @@ document.addEventListener("click", async (e) => {
       } else {
         pagePost.innerHTML = "";
       }
-
     } catch (error) {
-
+      console.log(error)
     }
   }
-
   if (e.target.matches(".btn-comment")) {
     CountedComment++;
     var indice = e.target.dataset.comment;
     let inputComment = document.getElementById(indice);
     let inputCommentValue = inputComment.value;
     let token = localStorage.getItem("token");
-
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", `Bearer ${token}`);
@@ -354,29 +420,24 @@ document.addEventListener("click", async (e) => {
       "text": `${inputCommentValue}`,
       "postId": parseInt(indice)
     });
-
     const requestOptions = {
       method: "POST",
       headers: myHeaders,
       body: raw,
       redirect: "follow"
     };
-
     try {
       const response = await fetch(`${API_URL}/comments`, requestOptions);
       const loginData = await response.json();
       console.log(loginData)
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
-
     const myHeadersPosts = new Headers();
     myHeadersPosts.append("Authorization", `Bearer ${token}`);
-
     const requestOptionsPosts = {
       headers: myHeadersPosts,
     };
-
     try {
       const newPost = await fetch(`${API_URL}/posts`, requestOptionsPosts)
       const postsData = await newPost.json();
@@ -386,14 +447,57 @@ document.addEventListener("click", async (e) => {
       } else {
         pagePost.innerHTML = "";
       }
-
     } catch (error) {
-
+      console.log(error)
     }
   }
   if (e.target.matches(".--btn-new-chat")) {
     bubbleChat.classList.toggle("bubble-chat-is-active")
     e.target.classList.toggle("btn-new-chat-cancel")
+    modalBackground.classList.toggle("none")
+    chatContactsContainer.classList.toggle("none")
+    nav.classList.toggle("none")
+    pagePost.classList.toggle("none")
+    window.scrollTo({ behavior: "smooth", top: 0 });
+  }
+  if (e.target.matches(".bubble-contact")) {
+    let userIdChat = e.target.dataset.contact;
+    let token = localStorage.getItem("token");
+    chat = ""
+    const myHeadersBubble = new Headers();
+    myHeadersBubble.append("Authorization", `Bearer ${token}`);
+    const requestOptionsBubble = {
+      headers: myHeadersBubble,
+    };
+    try {
+      const responseBubble = await fetch(`${API_URL}/users/${userIdChat}`, requestOptionsBubble)
+      const userChatData = await responseBubble.json();
+      if (userChatData) {
+        chat = `
+        <div id="chat-content-contact-${userChatData.id}" class="chat-content-active">
+          <header data-index="${userChatData.id}" class="content-header-footer">
+            <div class="user-header-contact">
+              <span class="photo-profile-avatar">${userChatData.name[0]}</span>
+              <span class="name-contact">${userChatData.name}</span>
+            </div>
+          <button data-index="${userChatData.id}" class="btn --btn-delete">x</button>
+        </header>
+        <div id="chat-${userChatData.id}" class="is-active ">aqui van los mensajes}</div>
+          <footer data-index="${userChatData.id}" class="content-header-footer">
+            <input data-index="${userChatData.id}" id="input-chat-contact-${userChatData.id}" class="input input-chat-contacts"
+              type="text" placeholder="Chat con ${userChatData.name}">
+            <button data-index="${userChatData.id}" id="btn-chat-send-contact-${userChatData.id}"
+              class="btn --btn-chat-send-contacts">✉️</button>
+          </footer>
+        </div>`
+      }
+      chatContactsContainer.innerHTML = chat;
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  if (e.target.matches(".--btn-delete")) {
+    chatContactsContainer.innerHTML = "";
   }
 });
 
@@ -436,12 +540,10 @@ function makeComment(comments) {
            <h2 id="post-${element.postId}-comment-${contador}"> ${moment(element.createdAt).fromNow()}</h2>
            </div>
             <button id="post-${element.postId}-comment-${contador}" data-post="${element.postId}" data-comment="${contador}" class="btn --options-comments">...</button>
-           
-            <button id="post-${element.postId}-edit-${contador}" data-edit="${element.id}" class="btn --edit">Edit</button>
-            <button id="post-${element.postId}-delete-${contador}" data-delete="${element.id}" class="btn --delete">Eliminar</button>
-          
-       </div>         
-         `;
+            <button id="post-${element.postId}-edit-${contador}" data-edit-id="${element.id}" class="btn edit-comment">Edit</button>
+            <button id="post-${element.postId}-delete-${contador}" data-delete-id="${element.id}" class="btn delete-comment">Eliminar</button>
+       </div >
+          `;
   }
   return makeComment;
 }
@@ -498,7 +600,7 @@ const generatePostsHtml = (postsData) => {
             </div>
         </div>
     </article>
-</article>`;
+</article > `;
     posterArray.unshift(poster)
   }
   pagePost.innerHTML = posterArray;

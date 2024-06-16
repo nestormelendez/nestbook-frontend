@@ -1,32 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-
-<body>
-    <div class="post-header-user">
-        <div class="photo-profile-avatar-comment">
-            <span>${element.user.name[0]}</span>
-        </div>
-        <div class="data-user-post">
-            <h2> ${element.user.name}</h2>
-            <div class="post-comment">
-                <span>
-                    ${element.text}
-                </span>
-            </div>
-            <h2 id="post-${element.postId}-comment-${contador}"> ${moment(element.createdAt).fromNow()}</h2>
-        </div>
-        <button data-option="${element.id}" class="btn --options-comments">...</button>
-        <div>
-            <button id="btn-${element.postId}-edit-${contador}" data-edit="${element.id}" class="btn --edit-comments">Editar</button>
-            <button id="btn-${element.postId}-delete-${contador}" data-delete="${element.id}" class="btn --delete-comments">Eliminar</button>
-        </div>
-    </div>
-</body>
-
-</html>
+<div id="chat-content-contact-${position}" class="chat-content-active">
+    <header data-index="${position}" class="content-header-footer">
+      <div class="user-header-contact">
+        <span class="photo-profile-avatar">${name.charAt(0)}</span>
+        <span class="name-contact">${receiver.userName}</span>
+      </div>
+      <button data-index="${position}" class="btn --btn-delete">x</button>
+    </header>
+    <div id="chat-${position}" class="is-active ">${createChat}</div>
+    <footer data-index="${position}" class="content-header-footer">
+      <input data-index="${position}" id="input-chat-contact-${position}" class="input input-chat-contacts"
+        type="text" placeholder="Chat con ${receiver.userName}">
+      <button data-index="${position}" id="btn-chat-send-contact-${position}"
+        class="btn --btn-chat-send-contacts">✉️</button>
+    </footer>
+  </div>
