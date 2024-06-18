@@ -88,7 +88,7 @@ async function updateMessageChat(message) {
   try {
     const responseBubble = await fetch(`${API_URL}/users`, requestOptionsBubble)
     const usersData = await responseBubble.json();
-    
+
     for (let index = 0; index < usersData.length; index++) {
       const element = usersData[index];
       if (element.id == message.userId) {
@@ -112,6 +112,12 @@ async function updateMessageChat(message) {
     `;
     chatReceiver.innerHTML += messageHTML;
     chatReceiver.scrollTop = chatReceiver.scrollHeight;
+  } else {
+    let notificationContent = document.getElementById(`notification-${message.userId}`);
+    console.log(notificationContent)
+    console.log(message.toUserId)
+    let notification = `✉️`;
+    notificationContent.innerText = notification;
   }
 }
 
@@ -238,7 +244,7 @@ document.addEventListener("click", async (e) => {
       <div id="bubble-${element.id}" class="bubble-contact">
         <div id="conectado-${element.id}" class="bubble-no-active"> </div>
         <button data-contact="${element.id}" class="bubble-contact">${element.name[0]}</button>
-        <span id="notification-${element.id}"> </span>
+        <span id="notification-${element.id}" class="notification"> </span>
       </div>  
             `;
         }
@@ -534,9 +540,67 @@ document.addEventListener("click", async (e) => {
     window.scrollTo({ behavior: "smooth", top: 0 });
   }
   if (e.target.matches(".bubble-contact")) {
-    let userIdChat = e.target.dataset.contact;
+    let userIdChat = parseInt(e.target.dataset.contact);
     let token = localStorage.getItem("token");
+    let notificationContent = document.getElementById(`notification-${userIdChat}`);
+    notificationContent.innerText = "";
     chat = ""
+    generateChat = ""
+    const myHeadersUsers = new Headers();
+    myHeadersUsers.append("Authorization", `Bearer ${token}`);
+    const requestOptionsUsers = {
+      headers: myHeadersUsers,
+    };
+    try {
+      const responseUsers = await fetch(`${API_URL}/users`, requestOptionsUsers)
+      const usersList = await responseUsers.json();
+
+      for (let index = 0; index < usersList.length; index++) {
+        const element = usersList[index];
+        if (element.id == userIdChat) {
+          sender = element.name
+        }
+      }
+    }
+    catch (error) {
+      console.log(error)
+    }
+
+
+    const myHeadersChats = new Headers();
+    myHeadersChats.append("Authorization", `Bearer ${token}`);
+    const requestOptionsChats = {
+      headers: myHeadersChats,
+    };
+    try {
+      const responseChats = await fetch(`${API_URL}/chats/${userIdChat}`, requestOptionsChats)
+      const listChats = await responseChats.json();
+      if (listChats)
+        for (let index = 0; index < listChats.length; index++) {
+          const element = listChats[index];
+          if (element.userId == userActive.id) {
+            generateChat += `
+            <div class="messageSend" data-user-id="${element.userId}">
+              <span class="message-text">${userActive.name}</span>
+              <span class="message-text">${element.text}</span>
+              <span class="message-text">${moment(element.createdAt).format("[Enviado a las ] HH:mm")}</span> 
+            </div>`
+          } else {
+            generateChat += `
+            <div class="messageReceived" data-user-id="${element.toUserId}">
+              <span class="message-text">${sender}</span>
+              <span class="message-text">${element.text}</span>
+              <span class="message-text">${moment(element.createdAt).format("[Recibido a las ] HH:mm")}</span> 
+            </div>`
+          }
+        }
+    } catch (error) {
+      console.log(error)
+    }
+
+
+
+
     const myHeadersBubble = new Headers();
     myHeadersBubble.append("Authorization", `Bearer ${token}`);
     const requestOptionsBubble = {
@@ -555,7 +619,7 @@ document.addEventListener("click", async (e) => {
             </div>
           <button data-index="${userChatData.id}" class="btn --btn-delete">x</button>
         </header>
-        <div id="chat-${userChatData.id}" class="is-active ">aqui van los mensajes}</div>
+        <div id="chat-${userChatData.id}" class="is-active ">${generateChat}</div>
           <footer data-index="${userChatData.id}" class="content-header-footer">
             <input data-index="${userChatData.id}" id="input-chat-contact-${userChatData.id}" class="input input-chat-contacts"
               type="text" placeholder="Chat con ${userChatData.name}">
@@ -569,6 +633,8 @@ document.addEventListener("click", async (e) => {
       console.log(error)
     }
   }
+
+
   if (e.target.matches(".--btn-delete")) {
     chatContactsContainer.innerHTML = "";
   }

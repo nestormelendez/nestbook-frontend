@@ -13,31 +13,110 @@ let btnSignUp = document.getElementById("btn-sign-up");
 let password = document.getElementById("password");
 let email = document.getElementById("email");
 let generatePosts = document.getElementById("generate-posts");
-
+let limpiarCambiarTiempo = null
 let chatContactsContainer = document.getElementById("chat-contacts-container");
 let chat = ""
+let generateChat = " "
 let modalBackground = document.getElementById("modal-background");
+let ws = null
+let sender = ""
+function initWebSocket(token) {
+  ws = new WebSocket('ws://192.168.0.142:4000');
 
-const ws = new WebSocket('ws://192.168.0.142:4000');
+  ws.onopen = () => {
+    console.log('Conexión establecida');
+    const objToSend = {
+      type: "connected-users",
+      token: token // Asegúrate de que `token` sea accesible aquí
+    };
+    ws.send(JSON.stringify(objToSend));
+  };
 
-
-async function connectedUsers() {
   ws.onmessage = (event) => {
-    let usersActive = (JSON.parse(event.data));
-    console.log(JSON.parse(event.data))
-    console.log(usersActive)
-    for (let index = 0; index < usersActive.users.length; index++) {
-      const element = usersActive.users[index];
-      console.log(element)
-      if (element.name !== userActive.name) {
-        let position = document.getElementById(`conectado-${element.id}`)
-        position.classList.toggle("contectado")
-      }
+    handleWebSocketMessage(event);
+
+  };
+
+  ws.onclose = () => {
+    console.log('Conexión cerrada');
+    alert("Gracias por visitarnos");
+  };
+}
+
+function handleWebSocketMessage(event) {
+  let data = JSON.parse(event.data);
+  console.log('Mensaje recibido:', data);
+
+  if (data.type === 'connected-users') {
+    updateConnectedUsers(data.users);
+    console.log(data.users)
+  }
+  if (data.type === 'message') {
+    console.log("se recibio un mensaje")
+    console.log(data.message)
+    updateMessageChat(data.message)
+  }
+}
+
+function updateConnectedUsers(users) {
+  let allBubbles = document.querySelectorAll(".bubble-no-active");
+  allBubbles.forEach(element => {
+    element.classList.remove("contectado");
+  });
+  users.forEach(user => {
+    if (user.id !== userActive.id) {
+      let userElement = document.getElementById(`conectado-${user.id}`);
+      userElement.classList.add("contectado");
+      console.log(user.id)
+      console.log(userElement)
     }
-  };  
+  });
 }
 
 
+async function updateMessageChat(message) {
+  console.log(message)
+  let token = localStorage.getItem("token");
+  const myHeadersBubble = new Headers();
+  myHeadersBubble.append("Authorization", `Bearer ${token}`);
+  const requestOptionsBubble = {
+    headers: myHeadersBubble,
+  };
+  try {
+    const responseBubble = await fetch(`${API_URL}/users`, requestOptionsBubble)
+    const usersData = await responseBubble.json();
+
+    for (let index = 0; index < usersData.length; index++) {
+      const element = usersData[index];
+      if (element.id == message.userId) {
+        sender = element.name
+      }
+    }
+  }
+  catch (error) {
+    console.log(error)
+  }
+
+  let chatReceiver = document.getElementById(`chat-${message.userId}`);
+
+  if (chatReceiver) {
+    let messageHTML = `
+      <div class="messageReceived" data-user-id="${message.toUserId}">
+        <span class="message-text">${sender}</span>
+        <span class="message-text">${message.text}</span>
+        <span class="message-text">${moment().format("[Enviado a las ]HH:mm")}</span> 
+      </div>
+    `;
+    chatReceiver.innerHTML += messageHTML;
+    chatReceiver.scrollTop = chatReceiver.scrollHeight;
+  } else {
+    let notificationContent = document.getElementById(`notification-${message.userId}`);
+    console.log(notificationContent)
+    console.log(message.toUserId)
+    let notification = `✉️`;
+    notificationContent.innerText = notification;
+  }
+}
 
 async function cambiarTiempo() {
   let token = localStorage.getItem("token");
@@ -72,23 +151,25 @@ async function cambiarTiempo() {
 }
 document.addEventListener("click", async (e) => {
   if (e.target.matches(".user-out")) {
+    clearInterval(limpiarCambiarTiempo)
     pagePost.classList.toggle("disguise");
     pageLogin.classList.toggle("disguise");
     bubbleContainer.classList.toggle("disguise");
     nav.classList.toggle("disguise");
     userActive = ""
     nav.innerHTML = ""
+    ws.close()
     localStorage.removeItem("user");
     localStorage.removeItem("token");
-    let token = localStorage.getItem("token");
-    const objToSend = {
-      type: "connected-users",
-      token,
-    }
-
-    ws.send(JSON.stringify(objToSend))
+    ws = null
   }
   if (e.target.matches(".btn-sign-up")) {
+
+    console.log("hola")
+
+
+
+
     let token = ""
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -133,13 +214,13 @@ document.addEventListener("click", async (e) => {
                 <button id="user-out" class="btn --menu-user user-out">Salir</button>
               </div>`;
 
-      const objToSend = {
-        type: "connected-users",
-        token,
-      }
-      ws.send(JSON.stringify(objToSend))
+      /*   const objToSend = {
+          type: "connected-users",
+          token,
+        }
+        ws.send(JSON.stringify(objToSend)) */
 
-
+      initWebSocket(token);
       nav.innerHTML = menu;
     } catch (error) {
       console.log(error);
@@ -158,14 +239,11 @@ document.addEventListener("click", async (e) => {
         if (element.name !== userActive.name) {
           bubble += `
       <div id="bubble-${element.id}" class="bubble-contact">
-        <div id="conectado-${element.id}"> </div>
+        <div id="conectado-${element.id}" class="bubble-no-active"> </div>
         <button data-contact="${element.id}" class="bubble-contact">${element.name[0]}</button>
-        <span id="notification-${element.id}"> </span>
+        <span id="notification-${element.id}" class="notification"></span>
       </div>  
             `;
-          console.log(element.id)
-          console.log(element.name)
-          console.log(element.name[0])
         }
       }
       bubbleChat.innerHTML = bubble;
@@ -182,11 +260,9 @@ document.addEventListener("click", async (e) => {
       const postsData = await newPost.json();
       if (postsData.length !== 0) {
         generatePostsHtml(postsData);
-        setInterval(() => {
+        limpiarCambiarTiempo = setInterval(() => {
           cambiarTiempo();
-          connectedUsers()
         }, 1000);
-
       } else {
         pagePost.innerHTML = "";
       }
@@ -460,10 +536,75 @@ document.addEventListener("click", async (e) => {
     pagePost.classList.toggle("none")
     window.scrollTo({ behavior: "smooth", top: 0 });
   }
+
+
+
+
+
+
+
   if (e.target.matches(".bubble-contact")) {
-    let userIdChat = e.target.dataset.contact;
+    let userIdChat = parseInt(e.target.dataset.contact);
     let token = localStorage.getItem("token");
+    let notificationContent = document.getElementById(`notification-${userIdChat}`);
+    notificationContent.innerText = "";
     chat = ""
+    generateChat = ""
+    const myHeadersUsers = new Headers();
+    myHeadersUsers.append("Authorization", `Bearer ${token}`);
+    const requestOptionsUsers = {
+      headers: myHeadersUsers,
+    };
+    try {
+      const responseUsers = await fetch(`${API_URL}/users`, requestOptionsUsers)
+      const usersList = await responseUsers.json();
+
+      for (let index = 0; index < usersList.length; index++) {
+        const element = usersList[index];
+        if (element.id == userIdChat) {
+          sender = element.name
+        }
+      }
+    }
+    catch (error) {
+      console.log(error)
+    }
+
+
+    const myHeadersChats = new Headers();
+    myHeadersChats.append("Authorization", `Bearer ${token}`);
+    const requestOptionsChats = {
+      headers: myHeadersChats,
+    };
+    try {
+      const responseChats = await fetch(`${API_URL}/chats/${userIdChat}`, requestOptionsChats)
+      const listChats = await responseChats.json();
+      if (listChats)
+        for (let index = 0; index < listChats.length; index++) {
+          const element = listChats[index];
+          if (element.userId == userActive.id) {
+            generateChat += `
+            <div class="messageSend" data-user-id="${element.userId}">
+              <span class="message-text">${userActive.name}</span>
+              <span class="message-text">${element.text}</span>
+              <span class="message-text">${moment(element.createdAt).format("[Enviado a las ] HH:mm")}</span> 
+            </div>`
+          } else {
+            generateChat += `
+            <div class="messageReceived" data-user-id="${element.toUserId}">
+              <span class="message-text">${sender}</span>
+              <span class="message-text">${element.text}</span>
+              <span class="message-text">${moment(element.createdAt).format("[Recibido a las ] HH:mm")}</span> 
+            </div>`
+          }
+        }
+    } catch (error) {
+      console.log(error)
+    }
+
+
+
+
     const myHeadersBubble = new Headers();
     myHeadersBubble.append("Authorization", `Bearer ${token}`);
     const requestOptionsBubble = {
@@ -482,7 +623,7 @@ document.addEventListener("click", async (e) => {
             </div>
           <button data-index="${userChatData.id}" class="btn --btn-delete">x</button>
         </header>
-        <div id="chat-${userChatData.id}" class="is-active ">aqui van los mensajes}</div>
+        <div id="chat-${userChatData.id}" class="is-active ">${generateChat}</div>
           <footer data-index="${userChatData.id}" class="content-header-footer">
             <input data-index="${userChatData.id}" id="input-chat-contact-${userChatData.id}" class="input input-chat-contacts"
               type="text" placeholder="Chat con ${userChatData.name}">
@@ -496,9 +637,67 @@ document.addEventListener("click", async (e) => {
       console.log(error)
     }
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   if (e.target.matches(".--btn-delete")) {
     chatContactsContainer.innerHTML = "";
   }
+
+
+
+  
+  if (e.target.matches(".--btn-chat-send-contacts")) {
+    let idReceiver = e.target.dataset.index
+    let inputMessage = document.getElementById(`input-chat-contact-${idReceiver}`).value;
+    let token = localStorage.getItem("token")
+    const mensaje = {
+      type: "message",
+      token,
+      text: inputMessage,
+      toUserId: parseInt(idReceiver)
+    }
+    ws.send(JSON.stringify(mensaje))
+    let chatReceiver = document.getElementById(`chat-${idReceiver}`);
+
+    if (chatReceiver) {
+      let messageHTML = `
+        <div class="messageSend" data-user-id="${idReceiver}">
+          <span class="message-text">${userActive.name}</span>
+          <span class="message-text">${inputMessage}</span>
+          <span class="message-text">${moment().format("[Enviado a las ]HH:mm")}</span> 
+        </div>
+      `;
+      chatReceiver.innerHTML += messageHTML;
+      chatReceiver.scrollTop = chatReceiver.scrollHeight;
+    }
+
+
+
+    console.log(mensaje)
+    console.log(inputMessage)
+    console.log(idReceiver)
+    document.getElementById(`input-chat-contact-${idReceiver}`).value = ""
+  }
+
 });
 
 function foundLikes(likes, postId) {

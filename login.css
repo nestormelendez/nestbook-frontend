@@ -583,6 +583,13 @@ html {
   top: 0;
   left: 0;
 }
+.notification {
+  width: 10px;
+  height: 10px;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
 .messageSend {
   margin: 10px;
   text-align: right;
