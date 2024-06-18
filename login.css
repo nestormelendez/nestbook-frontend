@@ -583,6 +583,22 @@ html {
   top: 0;
   left: 0;
 }
+.messageSend {
+  margin: 10px;
+  text-align: right;
+  display: flex;
+  flex-flow: column nowrap;
+}
+.messageReceived {
+  margin: 10px;
+  text-align: left;
+  display: flex;
+  flex-flow: column nowrap;
+}
+.message-text {
+  font-size: 0.8em;
+  color: var(--color-text);
+}
 
 @media screen and (max-width: 430px) {
   .main {

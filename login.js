@@ -50,16 +50,19 @@ function handleWebSocketMessage(event) {
     updateConnectedUsers(data.users);
     console.log(data.users)
   }
+  if (data.type === 'message') {
+    console.log("se recibio un mensaje")
+    console.log(data.message)
+    updateMessageChat(data.message)
+
+  }
 }
 
 function updateConnectedUsers(users) {
-  // 1. Elimina la clase "contectado" de todos los elementos
   let allBubbles = document.querySelectorAll(".bubble-no-active");
   allBubbles.forEach(element => {
     element.classList.remove("contectado");
   });
-
-  // 2. Agrega la clase "contectado" solo a los usuarios conectados
   users.forEach(user => {
     if (user.id !== userActive.id) {
       let userElement = document.getElementById(`conectado-${user.id}`);
@@ -68,6 +71,23 @@ function updateConnectedUsers(users) {
       console.log(userElement)
     }
   });
+}
+
+
+function updateMessageChat(message) {
+  let chatReceiver = document.getElementById(`chat-${message.toUserId}`);
+
+  if (chatReceiver) {
+    let messageHTML = `
+      <div class="messageReceived" data-user-id="${message.userId}">
+        <span class="message-text">${message.userId}</span>
+        <span class="message-text">${message.text}</span>
+        <span class="message-text">${moment(message.createdAt).fromNow()}</span> 
+      </div>
+    `;
+    chatReceiver.innerHTML += messageHTML;
+    chatReceiver.scrollTop = chatReceiver.scrollHeight;
+  }
 }
 
 async function cambiarTiempo() {
@@ -525,6 +545,39 @@ document.addEventListener("click", async (e) => {
   if (e.target.matches(".--btn-delete")) {
     chatContactsContainer.innerHTML = "";
   }
+  if (e.target.matches(".--btn-chat-send-contacts")) {
+    let idReceiver = e.target.dataset.index
+    let inputMessage = document.getElementById(`input-chat-contact-${idReceiver}`).value;
+    let token = localStorage.getItem("token")
+    const mensaje = {
+      type: "message",
+      token,
+      text: inputMessage,
+      toUserId: idReceiver
+    }
+    ws.send(JSON.stringify(mensaje))
+    let chatReceiver = document.getElementById(`chat-${idReceiver}`);
+
+    if (chatReceiver) {
+      let messageHTML = `
+        <div class="messageSend" data-user-id="${idReceiver}">
+          <span class="message-text">${idReceiver}</span>
+          <span class="message-text">${inputMessage}</span>
+          <span class="message-text">${moment().fromNow()}</span> 
+        </div>
+      `;
+      chatReceiver.innerHTML += messageHTML;
+      chatReceiver.scrollTop = chatReceiver.scrollHeight;
+    }
+
+
+
+    console.log(mensaje)
+    console.log(inputMessage)
+    console.log(idReceiver)
+    document.getElementById(`input-chat-contact-${idReceiver}`).value = ""
+  }
+
 });
 
 function foundLikes(likes, postId) {
