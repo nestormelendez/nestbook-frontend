@@ -19,27 +19,56 @@ let chat = ""
 let modalBackground = document.getElementById("modal-background");
 
 
-let ws = null;
+function initWebSocket(token) {
+  ws = new WebSocket('ws://192.168.0.142:4000');
 
+  ws.onopen = () => {
+    console.log('Conexión establecida');
+    const objToSend = {
+      type: "connected-users",
+      token: token // Asegúrate de que `token` sea accesible aquí
+    };
+    ws.send(JSON.stringify(objToSend));
+  };
 
-
-async function connectedUsers() {
   ws.onmessage = (event) => {
-    let usersActive = (JSON.parse(event.data));
-    console.log(JSON.parse(event.data))
-    console.log(usersActive)
-    for (let index = 0; index < usersActive.users.length; index++) {
-      const element = usersActive.users[index];
-      console.log(element)
-      if (element.name !== userActive.name) {
-        let position = document.getElementById(`conectado-${element.id}`)
-        position.classList.toggle("contectado")
-      }
-    }
+    handleWebSocketMessage(event);
+
+  };
+
+  ws.onclose = () => {
+    console.log('Conexión cerrada');
+    alert("Gracias por visitarnos");
   };
 }
 
+function handleWebSocketMessage(event) {
+  let data = JSON.parse(event.data);
+  console.log('Mensaje recibido:', data);
 
+  if (data.type === 'connected-users') {
+    updateConnectedUsers(data.users);
+    console.log(data.users)
+  }
+}
+
+function updateConnectedUsers(users) {
+  // 1. Elimina la clase "contectado" de todos los elementos
+  let allBubbles = document.querySelectorAll(".bubble-no-active");
+  allBubbles.forEach(element => {
+    element.classList.remove("contectado");
+  });
+
+  // 2. Agrega la clase "contectado" solo a los usuarios conectados
+  users.forEach(user => {
+    if (user.id !== userActive.id) {
+      let userElement = document.getElementById(`conectado-${user.id}`);
+      userElement.classList.add("contectado");
+      console.log(user.id)
+      console.log(userElement)
+    }
+  });
+}
 
 async function cambiarTiempo() {
   let token = localStorage.getItem("token");
@@ -81,33 +110,15 @@ document.addEventListener("click", async (e) => {
     nav.classList.toggle("disguise");
     userActive = ""
     nav.innerHTML = ""
+    ws.close()
     localStorage.removeItem("user");
     localStorage.removeItem("token");
-
-
-
-    ws.onclose = () => {
-      console.log('Conexión cerrada');
-      alert("Gracias por visitarnos")
-    };
-    ws = null;
 
   }
   if (e.target.matches(".btn-sign-up")) {
 
-    ws = new WebSocket('ws://192.168.0.142:4000');
 
 
-    ws.onopen = () => {
-      console.log('Conexión establecida');
-      const objToSend = {
-        type: "connected-users",
-        token,
-      };
-
-      ws.send(JSON.stringify(objToSend))
-
-    };
 
     let token = ""
     const myHeaders = new Headers();
@@ -159,7 +170,7 @@ document.addEventListener("click", async (e) => {
         }
         ws.send(JSON.stringify(objToSend)) */
 
-
+      initWebSocket(token);
       nav.innerHTML = menu;
     } catch (error) {
       console.log(error);
@@ -178,14 +189,11 @@ document.addEventListener("click", async (e) => {
         if (element.name !== userActive.name) {
           bubble += `
       <div id="bubble-${element.id}" class="bubble-contact">
-        <div id="conectado-${element.id}"> </div>
+        <div id="conectado-${element.id}" class="bubble-no-active"> </div>
         <button data-contact="${element.id}" class="bubble-contact">${element.name[0]}</button>
         <span id="notification-${element.id}"> </span>
       </div>  
             `;
-          console.log(element.id)
-          console.log(element.name)
-          console.log(element.name[0])
         }
       }
       bubbleChat.innerHTML = bubble;
@@ -203,10 +211,8 @@ document.addEventListener("click", async (e) => {
       if (postsData.length !== 0) {
         generatePostsHtml(postsData);
         limpiarCambiarTiempo = setInterval(() => {
-         cambiarTiempo();
+          cambiarTiempo();
         }, 1000);
-        connectedUsers()
-
       } else {
         pagePost.innerHTML = "";
       }

@@ -450,6 +450,7 @@ html {
   border-radius: 50%;
   background-color: var(--color-cancel);
   color: var(--color-text);
+  position: relative;
 }
 
 .chat-content-active {
@@ -578,6 +579,9 @@ html {
   border-radius: 50%;
   width: 10px;
   height: 10px;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 @media screen and (max-width: 430px) {
