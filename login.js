@@ -17,8 +17,8 @@ let limpiarCambiarTiempo = null
 let chatContactsContainer = document.getElementById("chat-contacts-container");
 let chat = ""
 let modalBackground = document.getElementById("modal-background");
-
-
+let ws = null
+let sender = ""
 function initWebSocket(token) {
   ws = new WebSocket('ws://192.168.0.142:4000');
 
@@ -52,6 +52,9 @@ function handleWebSocketMessage(event) {
   }
   if (data.type === 'message') {
     console.log("se recibio un mensaje")
+
+
+
     console.log(data.message)
     updateMessageChat(data.message)
 
@@ -74,15 +77,37 @@ function updateConnectedUsers(users) {
 }
 
 
-function updateMessageChat(message) {
-  let chatReceiver = document.getElementById(`chat-${message.toUserId}`);
+async function updateMessageChat(message) {
+  console.log(message)
+  let token = localStorage.getItem("token");
+  const myHeadersBubble = new Headers();
+  myHeadersBubble.append("Authorization", `Bearer ${token}`);
+  const requestOptionsBubble = {
+    headers: myHeadersBubble,
+  };
+  try {
+    const responseBubble = await fetch(`${API_URL}/users`, requestOptionsBubble)
+    const usersData = await responseBubble.json();
+    
+    for (let index = 0; index < usersData.length; index++) {
+      const element = usersData[index];
+      if (element.id == message.userId) {
+        sender = element.name
+      }
+    }
+  }
+  catch (error) {
+    console.log(error)
+  }
+
+  let chatReceiver = document.getElementById(`chat-${message.userId}`);
 
   if (chatReceiver) {
     let messageHTML = `
-      <div class="messageReceived" data-user-id="${message.userId}">
-        <span class="message-text">${message.userId}</span>
+      <div class="messageReceived" data-user-id="${message.toUserId}">
+        <span class="message-text">${sender}</span>
         <span class="message-text">${message.text}</span>
-        <span class="message-text">${moment(message.createdAt).fromNow()}</span> 
+        <span class="message-text">${moment().format("[Enviado a las ]HH:mm")}</span> 
       </div>
     `;
     chatReceiver.innerHTML += messageHTML;
@@ -133,9 +158,11 @@ document.addEventListener("click", async (e) => {
     ws.close()
     localStorage.removeItem("user");
     localStorage.removeItem("token");
-
+    ws = null
   }
   if (e.target.matches(".btn-sign-up")) {
+
+    console.log("hola")
 
 
 
@@ -553,7 +580,7 @@ document.addEventListener("click", async (e) => {
       type: "message",
       token,
       text: inputMessage,
-      toUserId: idReceiver
+      toUserId: parseInt(idReceiver)
     }
     ws.send(JSON.stringify(mensaje))
     let chatReceiver = document.getElementById(`chat-${idReceiver}`);
@@ -561,9 +588,9 @@ document.addEventListener("click", async (e) => {
     if (chatReceiver) {
       let messageHTML = `
         <div class="messageSend" data-user-id="${idReceiver}">
-          <span class="message-text">${idReceiver}</span>
+          <span class="message-text">${userActive.name}</span>
           <span class="message-text">${inputMessage}</span>
-          <span class="message-text">${moment().fromNow()}</span> 
+          <span class="message-text">${moment().format("[Enviado a las ]HH:mm")}</span> 
         </div>
       `;
       chatReceiver.innerHTML += messageHTML;
