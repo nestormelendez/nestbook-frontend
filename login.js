@@ -13,12 +13,14 @@ let btnSignUp = document.getElementById("btn-sign-up");
 let password = document.getElementById("password");
 let email = document.getElementById("email");
 let generatePosts = document.getElementById("generate-posts");
-
+let limpiarCambiarTiempo = null
 let chatContactsContainer = document.getElementById("chat-contacts-container");
 let chat = ""
 let modalBackground = document.getElementById("modal-background");
 
-const ws = new WebSocket('ws://192.168.0.142:4000');
+
+let ws = null;
+
 
 
 async function connectedUsers() {
@@ -34,7 +36,7 @@ async function connectedUsers() {
         position.classList.toggle("contectado")
       }
     }
-  };  
+  };
 }
 
 
@@ -72,6 +74,7 @@ async function cambiarTiempo() {
 }
 document.addEventListener("click", async (e) => {
   if (e.target.matches(".user-out")) {
+    clearInterval(limpiarCambiarTiempo)
     pagePost.classList.toggle("disguise");
     pageLogin.classList.toggle("disguise");
     bubbleContainer.classList.toggle("disguise");
@@ -80,15 +83,32 @@ document.addEventListener("click", async (e) => {
     nav.innerHTML = ""
     localStorage.removeItem("user");
     localStorage.removeItem("token");
-    let token = localStorage.getItem("token");
-    const objToSend = {
-      type: "connected-users",
-      token,
-    }
 
-    ws.send(JSON.stringify(objToSend))
+
+
+    ws.onclose = () => {
+      console.log('Conexión cerrada');
+      alert("Gracias por visitarnos")
+    };
+    ws = null;
+
   }
   if (e.target.matches(".btn-sign-up")) {
+
+    ws = new WebSocket('ws://192.168.0.142:4000');
+
+
+    ws.onopen = () => {
+      console.log('Conexión establecida');
+      const objToSend = {
+        type: "connected-users",
+        token,
+      };
+
+      ws.send(JSON.stringify(objToSend))
+
+    };
+
     let token = ""
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -133,11 +153,11 @@ document.addEventListener("click", async (e) => {
                 <button id="user-out" class="btn --menu-user user-out">Salir</button>
               </div>`;
 
-      const objToSend = {
-        type: "connected-users",
-        token,
-      }
-      ws.send(JSON.stringify(objToSend))
+      /*   const objToSend = {
+          type: "connected-users",
+          token,
+        }
+        ws.send(JSON.stringify(objToSend)) */
 
 
       nav.innerHTML = menu;
@@ -182,10 +202,10 @@ document.addEventListener("click", async (e) => {
       const postsData = await newPost.json();
       if (postsData.length !== 0) {
         generatePostsHtml(postsData);
-        setInterval(() => {
-          cambiarTiempo();
-          connectedUsers()
+        limpiarCambiarTiempo = setInterval(() => {
+         cambiarTiempo();
         }, 1000);
+        connectedUsers()
 
       } else {
         pagePost.innerHTML = "";

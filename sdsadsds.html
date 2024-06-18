@@ -1,16 +1,40 @@
-<div id="chat-content-contact-${position}" class="chat-content-active">
-    <header data-index="${position}" class="content-header-footer">
-      <div class="user-header-contact">
-        <span class="photo-profile-avatar">${name.charAt(0)}</span>
-        <span class="name-contact">${receiver.userName}</span>
-      </div>
-      <button data-index="${position}" class="btn --btn-delete">x</button>
-    </header>
-    <div id="chat-${position}" class="is-active ">${createChat}</div>
-    <footer data-index="${position}" class="content-header-footer">
-      <input data-index="${position}" id="input-chat-contact-${position}" class="input input-chat-contacts"
-        type="text" placeholder="Chat con ${receiver.userName}">
-      <button data-index="${position}" id="btn-chat-send-contact-${position}"
-        class="btn --btn-chat-send-contacts">✉️</button>
-    </footer>
-  </div>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat</title>
+</head>
+<body>
+  <h1>Chat</h1>
+
+  <textarea id="chat-area" readonly></textarea>
+  <input type="text" id="message-input" placeholder="Escribe un mensaje...">
+  <button id="send-button">Enviar</button>
+
+  <script>
+    const socket = new WebSocket('ws://localhost:8080');
+
+    socket.onopen = () => {
+      console.log('Conexión establecida');
+    };
+
+    socket.onmessage = (event) => {
+      // Mostrar el mensaje recibido en la textarea
+      document.getElementById('chat-area').value += `${event.data}\n`;
+    };
+
+    socket.onclose = () => {
+      console.log('Conexión cerrada');
+    };
+
+    document.getElementById('send-button').addEventListener('click', () => {
+      const message = document.getElementById('message-input').value;
+      if (message) {
+        socket.send(message);
+        // Agregar el mensaje enviado a la textarea
+        document.getElementById('chat-area').value += `Tú: ${message}\n`;
+        document.getElementById('message-input').value = '';
+      }
+    });
+  </script>
+</body>
+</html>
