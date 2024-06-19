@@ -1,9 +1,4 @@
-let likes = [];
-let CountedLikes = 0;
-let CountedComment = 0;
 const API_URL = "http://192.168.0.142:4000"
-let userActive = {};
-let userStorage = "Users";
 let pageLogin = document.getElementById("page-login");
 let pagePost = document.getElementById("generate-posts");
 let nav = document.getElementById("menu");
@@ -13,12 +8,20 @@ let btnSignUp = document.getElementById("btn-sign-up");
 let password = document.getElementById("password");
 let email = document.getElementById("email");
 let generatePosts = document.getElementById("generate-posts");
-let limpiarCambiarTiempo = null
-let chatContactsContainer = document.getElementById("chat-contacts-container");
-let chat = ""
 let modalBackground = document.getElementById("modal-background");
+let chatContactsContainer = document.getElementById("chat-contacts-container");
+let likes = [];
+let userActive = {};
+let CountedLikes = 0;
+let CountedComment = 0;
+let userStorage = "Users";
 let ws = null
+let limpiarCambiarTiempo = null
+let chat = ""
 let sender = ""
+let reloadMessageValue = ""
+
+
 function initWebSocket(token) {
   ws = new WebSocket('ws://192.168.0.142:4000');
 
@@ -41,7 +44,6 @@ function initWebSocket(token) {
     alert("Gracias por visitarnos");
   };
 }
-
 function handleWebSocketMessage(event) {
   let data = JSON.parse(event.data);
   console.log('Mensaje recibido:', data);
@@ -60,7 +62,6 @@ function handleWebSocketMessage(event) {
 
   }
 }
-
 function updateConnectedUsers(users) {
   let allBubbles = document.querySelectorAll(".bubble-no-active");
   allBubbles.forEach(element => {
@@ -75,8 +76,6 @@ function updateConnectedUsers(users) {
     }
   });
 }
-
-
 async function updateMessageChat(message) {
   console.log(message)
   let token = localStorage.getItem("token");
@@ -104,11 +103,14 @@ async function updateMessageChat(message) {
 
   if (chatReceiver) {
     let messageHTML = `
-      <div class="messageReceived" data-user-id="${message.toUserId}">
-        <span class="message-text">${sender}</span>
-        <span class="message-text">${message.text}</span>
-        <span class="message-text">${moment().format("[Enviado a las ]HH:mm")}</span> 
-      </div>
+     
+       <div class="messageReceived" data-user-id="${message.toUserId}">
+              <div class="photo-text-received">
+                <div class="photo-profile-avatar-comment">${sender[0]}</div>
+                <span class="message-received-content">${message.text}</span>
+              </div>
+              <span class="message-received-moment">${moment().format("[Enviado a las ] HH:mm")}</span> 
+            </div>
     `;
     chatReceiver.innerHTML += messageHTML;
     chatReceiver.scrollTop = chatReceiver.scrollHeight;
@@ -120,7 +122,6 @@ async function updateMessageChat(message) {
     notificationContent.innerText = notification;
   }
 }
-
 async function cambiarTiempo() {
   let token = localStorage.getItem("token");
 
@@ -152,6 +153,178 @@ async function cambiarTiempo() {
     console.log(error)
   }
 }
+function foundLikes(likes, postId) {
+  let likeCount = 0;
+  for (const like of likes) {
+    if (like.postId === postId) {
+      likeCount++;
+    }
+  }
+  return likeCount;
+}
+function foundComment(comments, postId) {
+  let commentCount = 0;
+  for (const comment of comments) {
+    if (comment.postId === postId) {
+      commentCount++;
+    }
+  }
+  return commentCount;
+}
+function makeComment(comments) {
+  let makeComment = ``;
+
+  for (let index = 0; index < comments.length; index++) {
+    const element = comments[index];
+    let contador = index + 1;
+    makeComment += `
+         <div class="post-header-user">
+          <div class="photo-profile-avatar-comment">
+            <span>${element.user.name[0]}</span>
+          </div>   
+          <div class="data-user-post">
+           <h2> ${element.user.name}</h2>
+           <div class="post-comment">
+              <span>
+              ${element.text}
+              </span>
+            </div>
+           <h2 id="post-${element.postId}-comment-${contador}"> ${moment(element.createdAt).fromNow()}</h2>
+           </div>
+            <button id="post-${element.postId}-comment-${contador}" data-post="${element.postId}" data-comment="${contador}" class="btn --options-comments">...</button>
+            <button id="post-${element.postId}-edit-${contador}" data-edit-id="${element.id}" class="btn edit-comment">Edit</button>
+            <button id="post-${element.postId}-delete-${contador}" data-delete-id="${element.id}" class="btn delete-comment">Eliminar</button>
+       </div >
+          `;
+  }
+  return makeComment;
+}
+const generatePostsHtml = (postsData) => {
+  let poster = ``;
+  let posterArray = [];
+
+  for (let index = 0; index < postsData.length; index++) {
+    const element = postsData[index];
+    const postLikes = foundLikes(likes, element.id);
+    const postComments = foundComment(element.comments, element.id);
+    const makeComments = makeComment(element.comments);
+    // const makeComments = "";  
+    poster = ` 
+         <article id="post-${element.id}" class="content post">
+  <header class="post-header">
+    <div class="post-header-user">
+      <div class="photo-profile-avatar">
+        <span>${element.user.name.charAt(0)}</span>
+      </div>
+      <div class="data-user-post">
+        <h2> ${element.user.name}</h2>
+        <h2 id="time-post-${element.id}"> ${moment(element.createdAt).fromNow()}</h2>
+      </div>
+      <div class="btn-delete">
+        <button data-delete="${element.id}" class="btn delete-post">X</button>
+      </div>
+    </div>
+  </header>
+  <div class="container  post-content">
+    <span>
+      ${element.content}
+    </span>
+    <div id="post-likes" class="post-likes">
+      <h5>❤️ ${element.likes.length}</h5>
+      <h5>${postComments} Comentarios</h5>
+    </div>
+  </div>
+  <footer class="btns-comment">
+    <button data-like="${element.id}" class="btn --btn-post btn-like">Me gusta</button>
+    <button data-comment="${element.id}" class="btn --btn-post btn-comment">Comentar</button>
+    <button class="btn --btn-post">Compartir</button>
+  </footer>
+  <article id="container-comment" class="container-comment">
+    ${makeComments}
+    <div class="post-contents">
+      <div class="post-header-user">
+        <div class="photo-profile-avatar">
+          <span>${userActive.name.charAt(0)}</span>
+        </div>
+        <input id="${element.id}" class="input-comment" type="text" placeholder="      Comentar como ${userActive.name}">
+        <button data-comment="${element.id}" class="--btn-comment btn-comment">
+          <svg data-comment="${element.id}" style="width: 35px;" class="btn-comment" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <path data-comment="${element.id}" style="width: 35px;" class="btn-comment" fill="#0084ff"
+              d="M498.1 5.6c10.1 7 15.4 19.1 13.5 31.2l-64 416c-1.5 9.7-7.4 18.2-16 23s-18.9 5.4-28 1.6L284 427.7l-68.5 74.1c-8.9 9.7-22.9 12.9-35.2 8.1S160 493.2 160 480V396.4c0-4 1.5-7.8 4.2-10.7L331.8 202.8c5.8-6.3 5.6-16-.4-22s-15.7-6.4-22-.7L106 360.8 17.7 316.6C7.1 311.3 .3 300.7 0 288.9s5.9-22.8 16.1-28.7l448-256c10.7-6.1 23.9-5.5 34 1.4z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </article>
+</article>
+`
+      ;
+    posterArray.unshift(poster)
+  }
+  pagePost.innerHTML = posterArray.join("");
+};
+
+async function reloadMessage(userIdChat) {
+  let token = localStorage.getItem("token");
+  let chatContent = document.getElementById(`chat-${userIdChat}`);
+  let generateChat = ""
+  const myHeadersUsers = new Headers();
+  myHeadersUsers.append("Authorization", `Bearer ${token}`);
+  const requestOptionsUsers = {
+    headers: myHeadersUsers,
+  };
+  try {
+    const responseUsers = await fetch(`${API_URL}/users`, requestOptionsUsers)
+    const usersList = await responseUsers.json();
+    for (let index = 0; index < usersList.length; index++) {
+      const element = usersList[index];
+      if (element.id == userIdChat) {
+        sender = element.name
+      }
+    }
+  }
+  catch (error) {
+    console.log(error)
+  }
+  const myHeadersChats = new Headers();
+  myHeadersChats.append("Authorization", `Bearer ${token}`);
+  const requestOptionsChats = {
+    headers: myHeadersChats,
+  };
+  try {
+    const responseChats = await fetch(`${API_URL}/chats/${userIdChat}`, requestOptionsChats)
+    const listChats = await responseChats.json();
+    if (listChats)
+      for (let index = 0; index < listChats.length; index++) {
+        const element = listChats[index];
+        if (element.userId == userActive.id) {
+          generateChat += `
+          <div class="messageSend" data-user-id="${element.userId}">
+            <p class="message-sender-content">${element.text}</p>
+            <span class="message-sender-moment">${moment(element.createdAt).fromNow()}</span> 
+          </div>`
+        } else {
+          generateChat += `
+          <div class="messageReceived" data-user-id="${element.toUserId}">
+            <div class="photo-text-received">
+              <div class="photo-profile-avatar-comment">${sender[0]}</div>
+              <span class="message-received-content">${element.text}</span>
+            </div>
+            <span class="message-received-moment">${moment(element.createdAt).fromNow()}</span> 
+          </div>`
+        }
+      }
+    chatContent.innerHTML = generateChat;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
+
+
+
+
 document.addEventListener("click", async (e) => {
   if (e.target.matches(".user-out")) {
     clearInterval(limpiarCambiarTiempo)
@@ -167,12 +340,7 @@ document.addEventListener("click", async (e) => {
     ws = null
   }
   if (e.target.matches(".btn-sign-up")) {
-
     console.log("hola")
-
-
-
-
     let token = ""
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -202,27 +370,25 @@ document.addEventListener("click", async (e) => {
       pageLogin.classList.toggle("disguise");
       bubbleContainer.classList.toggle("disguise");
       nav.classList.toggle("disguise");
-      let menu = `<div class="menu-user">
-              <div class="photo-profile-avatar">
-                <span>${loginData.user.name.charAt(0)}</span>
-              </div>
-                  <h2> ${loginData.user.name}</h2>
-                    </div>
-                  </div>
+      let menu = `
+    <div class="user-active">
+      <div class="photo-profile-avatar">
+        <span>${loginData.user.name.charAt(0)}</span>
+      </div>
+      <div class="post-input">
+        <h2> ${loginData.user.name}</h2>
+        <button id="user-out" class="btn --menu-user user-out">Salir</button>
+      </div>
+    </div>
 
-                  <textarea id="input-post" class="input-post" name="" rows="3" maxlength="255" placeholder="¿Que estas pensando?"></textarea>
-              </div>                        
-              <div class="btn-options"> 
-                <button id="create-post" class="btn --menu-user create-post">Publicar</button>
-                <button id="user-out" class="btn --menu-user user-out">Salir</button>
-              </div>`;
-
-      /*   const objToSend = {
-          type: "connected-users",
-          token,
-        }
-        ws.send(JSON.stringify(objToSend)) */
-
+    <div class="btn-options">
+    <textarea id="input-post" class="input-post" name="" rows="3" maxlength="255"
+    placeholder="¿Que estas pensando?"></textarea>
+    <button id="create-post" class="--menu-user create-post">
+        <svg class="create-post" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+    <path class="create-post" fill="#0084ff" d="M0 64C0 28.7 28.7 0 64 0H224V128c0 17.7 14.3 32 32 32H384v38.6C310.1 219.5 256 287.4 256 368c0 59.1 29.1 111.3 73.7 143.3c-3.2 .5-6.4 .7-9.7 .7H64c-35.3 0-64-28.7-64-64V64zm384 64H256V0L384 128zm48 96a144 144 0 1 1 0 288 144 144 0 1 1 0-288zm16 80c0-8.8-7.2-16-16-16s-16 7.2-16 16v48H368c-8.8 0-16 7.2-16 16s7.2 16 16 16h48v48c0 8.8 7.2 16 16 16s16-7.2 16-16V384h48c8.8 0 16-7.2 16-16s-7.2-16-16-16H448V304z"/></svg>
+    </button>
+    </div>`;
       initWebSocket(token);
       nav.innerHTML = menu;
     } catch (error) {
@@ -312,7 +478,6 @@ document.addEventListener("click", async (e) => {
     }
   }
   if (e.target.matches(".delete-post")) {
-
     let deletePostConfirm = confirm("¿Estas seguro de borrar esta publicacion?")
     if (deletePostConfirm) {
       let deletePost = e.target.dataset.delete;
@@ -320,13 +485,11 @@ document.addEventListener("click", async (e) => {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
       myHeaders.append("Authorization", `Bearer ${token}`);
-
       const requestOptions = {
         method: "DELETE",
         headers: myHeaders,
         redirect: "follow"
       };
-
       try {
         const response = await fetch(`${API_URL}/posts/${deletePost}`, requestOptions);
         const message = await response.json();
@@ -334,13 +497,9 @@ document.addEventListener("click", async (e) => {
       } catch (error) {
         console.log(error);
       }
-
-
       const myHeadersPosts = new Headers();
       myHeadersPosts.append("Authorization", `Bearer ${token}`);
-
       const requestOptionsPosts = { headers: myHeadersPosts, };
-
       try {
         const postsList = await fetch(`${API_URL}/posts`, requestOptionsPosts)
         const postsData = await postsList.json();
@@ -353,7 +512,6 @@ document.addEventListener("click", async (e) => {
         console.log(error)
       }
     }
-
   }
   if (e.target.matches(".delete-comment")) {
     let deletePostConfirm = confirm("¿Estas seguro de borrar este comentario?")
@@ -430,7 +588,6 @@ document.addEventListener("click", async (e) => {
         console.log(error)
       }
     }
-
   }
   if (e.target.matches(".--options-comments")) {
     let positionPost = e.target.dataset.post
@@ -468,7 +625,6 @@ document.addEventListener("click", async (e) => {
     }
     const myHeadersPosts = new Headers();
     myHeadersPosts.append("Authorization", `Bearer ${token}`);
-
     const requestOptionsPosts = {
       headers: myHeadersPosts,
     };
@@ -540,12 +696,15 @@ document.addEventListener("click", async (e) => {
     window.scrollTo({ behavior: "smooth", top: 0 });
   }
   if (e.target.matches(".bubble-contact")) {
+    clearInterval(reloadMessageValue)
     let userIdChat = parseInt(e.target.dataset.contact);
+    console.log(userIdChat)
     let token = localStorage.getItem("token");
     let notificationContent = document.getElementById(`notification-${userIdChat}`);
+
     notificationContent.innerText = "";
-    chat = ""
-    generateChat = ""
+    let chat = ""
+    let generateChat = ""
     const myHeadersUsers = new Headers();
     myHeadersUsers.append("Authorization", `Bearer ${token}`);
     const requestOptionsUsers = {
@@ -554,7 +713,6 @@ document.addEventListener("click", async (e) => {
     try {
       const responseUsers = await fetch(`${API_URL}/users`, requestOptionsUsers)
       const usersList = await responseUsers.json();
-
       for (let index = 0; index < usersList.length; index++) {
         const element = usersList[index];
         if (element.id == userIdChat) {
@@ -565,8 +723,6 @@ document.addEventListener("click", async (e) => {
     catch (error) {
       console.log(error)
     }
-
-
     const myHeadersChats = new Headers();
     myHeadersChats.append("Authorization", `Bearer ${token}`);
     const requestOptionsChats = {
@@ -581,26 +737,23 @@ document.addEventListener("click", async (e) => {
           if (element.userId == userActive.id) {
             generateChat += `
             <div class="messageSend" data-user-id="${element.userId}">
-              <span class="message-text">${userActive.name}</span>
-              <span class="message-text">${element.text}</span>
-              <span class="message-text">${moment(element.createdAt).format("[Enviado a las ] HH:mm")}</span> 
+              <p class="message-sender-content">${element.text}</p>
+              <span class="message-sender-moment">${moment(element.createdAt).fromNow()}</span> 
             </div>`
           } else {
             generateChat += `
             <div class="messageReceived" data-user-id="${element.toUserId}">
-              <span class="message-text">${sender}</span>
-              <span class="message-text">${element.text}</span>
-              <span class="message-text">${moment(element.createdAt).format("[Recibido a las ] HH:mm")}</span> 
+              <div class="photo-text-received">
+                <div class="photo-profile-avatar-comment">${sender[0]}</div>
+                <span class="message-received-content">${element.text}</span>
+              </div>
+              <span class="message-received-moment">${moment(element.createdAt).fromNow()}</span> 
             </div>`
           }
         }
     } catch (error) {
       console.log(error)
     }
-
-
-
-
     const myHeadersBubble = new Headers();
     myHeadersBubble.append("Authorization", `Bearer ${token}`);
     const requestOptionsBubble = {
@@ -624,19 +777,26 @@ document.addEventListener("click", async (e) => {
             <input data-index="${userChatData.id}" id="input-chat-contact-${userChatData.id}" class="input input-chat-contacts"
               type="text" placeholder="Chat con ${userChatData.name}">
             <button data-index="${userChatData.id}" id="btn-chat-send-contact-${userChatData.id}"
-              class="btn --btn-chat-send-contacts">✉️</button>
+              class="btn-chat --btn-chat-send-contacts">
+              <svg data-index="${userChatData.id}" class="btn-chat --btn-chat-send-contacts" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+              <path data-index="${userChatData.id}" class="btn-chat --btn-chat-send-contacts" fill="#0084ff" d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48H48zM0 176V384c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V176L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z"/></svg>
+              </button>
           </footer>
         </div>`
       }
       chatContactsContainer.innerHTML = chat;
+      let chatReceiver = document.getElementById(`chat-${userIdChat}`);
+      chatReceiver.scrollTop = chatReceiver.scrollHeight;
+      reloadMessageValue = setInterval(() => {
+        reloadMessage(userIdChat)
+      }, 1000);
     } catch (error) {
       console.log(error)
     }
   }
-
-
   if (e.target.matches(".--btn-delete")) {
     chatContactsContainer.innerHTML = "";
+    clearInterval(reloadMessageValue)
   }
   if (e.target.matches(".--btn-chat-send-contacts")) {
     let idReceiver = e.target.dataset.index
@@ -650,21 +810,16 @@ document.addEventListener("click", async (e) => {
     }
     ws.send(JSON.stringify(mensaje))
     let chatReceiver = document.getElementById(`chat-${idReceiver}`);
-
     if (chatReceiver) {
       let messageHTML = `
-        <div class="messageSend" data-user-id="${idReceiver}">
-          <span class="message-text">${userActive.name}</span>
-          <span class="message-text">${inputMessage}</span>
-          <span class="message-text">${moment().format("[Enviado a las ]HH:mm")}</span> 
-        </div>
+            <div class="messageSend" data-user-id="${idReceiver}">
+              <p class="message-sender-content">${inputMessage}</p>
+              <span class="message-sender-moment">${moment().format("[Enviado a las ] HH:mm")}</span> 
+            </div>
       `;
       chatReceiver.innerHTML += messageHTML;
       chatReceiver.scrollTop = chatReceiver.scrollHeight;
     }
-
-
-
     console.log(mensaje)
     console.log(inputMessage)
     console.log(idReceiver)
@@ -673,107 +828,3 @@ document.addEventListener("click", async (e) => {
 
 });
 
-function foundLikes(likes, postId) {
-  let likeCount = 0;
-  for (const like of likes) {
-    if (like.postId === postId) {
-      likeCount++;
-    }
-  }
-  return likeCount;
-}
-function foundComment(comments, postId) {
-  let commentCount = 0;
-  for (const comment of comments) {
-    if (comment.postId === postId) {
-      commentCount++;
-    }
-  }
-  return commentCount;
-}
-function makeComment(comments) {
-  let makeComment = ``;
-
-  for (let index = 0; index < comments.length; index++) {
-    const element = comments[index];
-    let contador = index + 1;
-    makeComment += `
-         <div class="post-header-user">
-          <div class="photo-profile-avatar-comment">
-            <span>${element.user.name[0]}</span>
-          </div>   
-          <div class="data-user-post">
-           <h2> ${element.user.name}</h2>
-           <div class="post-comment">
-              <span>
-              ${element.text}
-              </span>
-            </div>
-           <h2 id="post-${element.postId}-comment-${contador}"> ${moment(element.createdAt).fromNow()}</h2>
-           </div>
-            <button id="post-${element.postId}-comment-${contador}" data-post="${element.postId}" data-comment="${contador}" class="btn --options-comments">...</button>
-            <button id="post-${element.postId}-edit-${contador}" data-edit-id="${element.id}" class="btn edit-comment">Edit</button>
-            <button id="post-${element.postId}-delete-${contador}" data-delete-id="${element.id}" class="btn delete-comment">Eliminar</button>
-       </div >
-          `;
-  }
-  return makeComment;
-}
-const generatePostsHtml = (postsData) => {
-  let poster = ``;
-  let posterArray = [];
-
-  for (let index = 0; index < postsData.length; index++) {
-    const element = postsData[index];
-    const postLikes = foundLikes(likes, element.id);
-    const postComments = foundComment(element.comments, element.id);
-    const makeComments = makeComment(element.comments);
-    // const makeComments = "";  
-    poster = ` 
-         <article id="post-${element.id}" class="content post">
-    <header class="post-header">
-        <div class="post-header-user">
-            <div class="photo-profile-avatar">
-                <span>${element.user.name.charAt(0)}</span>
-            </div>
-            <div class="data-user-post">
-                <h2> ${element.user.name}</h2>
-                <h2 id="time-post-${element.id}"> ${moment(element.createdAt).fromNow()}</h2>
-            </div>
-            <div class="btn-delete">
-                <button data-delete="${element.id}" class="btn delete-post">X</button>
-            </div>
-        </div>
-    </header>
-    <div class="container  post-content">
-        <span>
-            ${element.content}
-        </span>
-        <div id="post-likes" class="post-likes">
-            <h5>❤️ ${element.likes.length}</h5>
-            <h5>${postComments} Comentarios</h5>
-        </div>
-    </div>
-    <footer class="btns-comment">
-        <button data-like="${element.id}" class="btn --btn-post btn-like">Me gusta</button>
-        <button data-comment="${element.id}" class="btn --btn-post btn-comment">Comentar</button>
-        <button class="btn --btn-post">Compartir</button>
-    </footer>
-    <article id="container-comment" class="container-comment">
-        ${makeComments}
-        <div class="post-contents">
-            <div class="post-header-user">
-                <div class="photo-profile-avatar">
-                    <span>${userActive.name.charAt(0)}</span>
-                </div>
-                <input id="${element.id}" class="input-comment" type="text"
-                    placeholder="     Comentar como ${userActive.name}">
-                <button data-comment="${element.id}" class="btn --btn-comment btn-comment">Comentar</button>
-            </div>
-        </div>
-    </article>
-</article > `;
-    posterArray.unshift(poster)
-  }
-  pagePost.innerHTML = posterArray;
-};
