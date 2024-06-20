@@ -78,7 +78,6 @@ html {
   min-height: 250px;
   margin: 15px 0;
 }
-
 .post-header {
   display: flex;
   justify-content: space-between;
@@ -124,7 +123,6 @@ html {
   background-color: var(--color-cancel);
   color: var(--color-text);
 }
-
 .photo-profile img {
   border-radius: 50%;
   width: 50px;
@@ -144,13 +142,11 @@ html {
   border-radius: 5px;
   box-shadow: 5px 5px rgba(0, 0, 0, 0.096);
 }
-
 .post {
   border: 0.3px solid var(--color-background-ligth);
   border-radius: 5px;
   box-shadow: 5px 5px rgba(0, 0, 0, 0.096);
 }
-
 .facebook {
   width: 450px;
   margin: 0 35px;
@@ -185,7 +181,6 @@ html {
   font-size: 1em;
   font-weight: 600;
 }
-
 .btn-svg {
   border-radius: 5px;
   border: none;
@@ -232,7 +227,6 @@ html {
   right: 8%;
   top: 60%;
 }
-
 .btns-comment {
   display: flex;
   justify-content: space-around;
@@ -375,7 +369,6 @@ html {
   padding-right: 10px;
   width: 90%;
 }
-
 .menu {
   display: flex;
   flex-flow: column nowrap;
@@ -462,7 +455,6 @@ html {
   color: var(--color-text);
   position: relative;
 }
-
 .chat-content-active {
   z-index: 100;
   display: flex;
@@ -484,7 +476,6 @@ html {
   justify-content: space-between;
   padding: 5px;
 }
-
 .user-header-contact {
   display: flex;
 }
@@ -609,7 +600,6 @@ html {
   align-items: end;
   padding-right: 10px;
 }
-
 .message-sender-content {
   background-color: var(--color-btn);
   border-radius: 20px;
@@ -649,7 +639,6 @@ html {
   padding-left: 10px;
   width: 100%;
 }
-
 .message-received-content {
   background-color: var(--color-background-ligth);
   border-radius: 20px;
@@ -698,7 +687,6 @@ justify-content: end;
 .disguise {
   display: none;
 }
-
 @media screen and (max-width: 430px) {
   .main {
     width: 250px;
@@ -746,7 +734,6 @@ justify-content: end;
     flex-flow: row wrap;
     padding-top: 40px;
   }
-
   .bubble-container {
     display: flex;
     flex-flow: row nowrap;
@@ -763,7 +750,6 @@ justify-content: end;
     padding: 10px;
     z-index: 2000;
   }
-
   .--btn-new-chat {
     position: fixed;
     top: 92%;
@@ -780,7 +766,6 @@ justify-content: end;
     background-color: var(--color-cancel);
     transform: rotate(45deg);
   }
-
   .bubble-chat {
     width: auto;
     display: flex;
@@ -822,7 +807,6 @@ justify-content: end;
   .container-comment {
     width: 350px;
   }
-
   .page-posts {
     width: 250px;
     margin-top: 150px;
@@ -874,7 +858,6 @@ justify-content: end;
     right: 15%;
     top: 60%;
   }
-
   .chat-contacts-container {
     width: 350px;
     display: flex;
@@ -934,7 +917,6 @@ justify-content: end;
     align-items: end;
     padding-right: 10px;
   }
-  
   .message-sender-content {
     background-color: var(--color-btn);
     border-radius: 20px;
@@ -974,7 +956,6 @@ justify-content: end;
     padding-left: 10px;
     width: 100%;
   }
-  
   .message-received-content {
     background-color: var(--color-background-ligth);
     border-radius: 20px;

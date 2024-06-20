@@ -43,7 +43,6 @@ function initWebSocket(token) {
     alert("Gracias por visitarnos");
   };
 }
-
 function handleWebSocketMessage(event) {
   let data = JSON.parse(event.data);
   console.log('Mensaje recibido:', data);
@@ -57,7 +56,6 @@ function handleWebSocketMessage(event) {
     console.log(data.message)
     updateMessageChat(data.message)
     notificationWindown(data.message)
-
   }
 }
 function updateConnectedUsers(users) {
