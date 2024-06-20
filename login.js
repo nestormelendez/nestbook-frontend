@@ -1,4 +1,4 @@
-const API_URL = "http://192.168.0.142:4000"
+const API_URL = "https://nestbook-backend.onrender.com"
 let pageLogin = document.getElementById("page-login");
 let pagePost = document.getElementById("generate-posts");
 let nav = document.getElementById("menu");
@@ -22,7 +22,7 @@ let sender = ""
 let reloadMessageValue = ""
 
 function initWebSocket(token) {
-  ws = new WebSocket('ws://192.168.0.142:4000');
+  ws = new WebSocket('wss://nestbook-backend.onrender.com');
 
   ws.onopen = () => {
     console.log('Conexión establecida');
