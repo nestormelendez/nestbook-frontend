@@ -21,7 +21,6 @@ let chat = ""
 let sender = ""
 let reloadMessageValue = ""
 
-
 function initWebSocket(token) {
   ws = new WebSocket('ws://192.168.0.142:4000');
 
@@ -44,6 +43,7 @@ function initWebSocket(token) {
     alert("Gracias por visitarnos");
   };
 }
+
 function handleWebSocketMessage(event) {
   let data = JSON.parse(event.data);
   console.log('Mensaje recibido:', data);
@@ -54,11 +54,9 @@ function handleWebSocketMessage(event) {
   }
   if (data.type === 'message') {
     console.log("se recibio un mensaje")
-
-
-
     console.log(data.message)
     updateMessageChat(data.message)
+    notificationWindown(data.message)
 
   }
 }
@@ -120,6 +118,23 @@ async function updateMessageChat(message) {
     console.log(message.toUserId)
     let notification = `✉️`;
     notificationContent.innerText = notification;
+  }
+}
+function notificationWindown(message) {
+  if (Notification.permission === `granted`) {
+    const notificacion = new Notification(`Tienes un mensaje de ${message.userId}`, {
+      icon: `./assets/logo2.png`,
+      body: `${message.text}`,
+    });
+    notificacion.onclick = function () {
+      // const existingWindow = window.open('https://nestormelendez.github.io/alarma_de_tareas/', 'noopener');
+      const existingWindow = window.open("http://127.0.0.1:5500/index.html", "noopener");
+      if (existingWindow) {
+        existingWindow.focus();
+       
+      }
+      /* window.open(`https://nestormelendez.github.io/alarma_de_tareas/`) */
+    };
   }
 }
 async function cambiarTiempo() {
@@ -263,7 +278,6 @@ const generatePostsHtml = (postsData) => {
   }
   pagePost.innerHTML = posterArray.join("");
 };
-
 async function reloadMessage(userIdChat) {
   let token = localStorage.getItem("token");
   let chatContent = document.getElementById(`chat-${userIdChat}`);
@@ -319,12 +333,6 @@ async function reloadMessage(userIdChat) {
     console.log(error)
   }
 }
-
-
-
-
-
-
 document.addEventListener("click", async (e) => {
   if (e.target.matches(".user-out")) {
     clearInterval(limpiarCambiarTiempo)
@@ -340,7 +348,11 @@ document.addEventListener("click", async (e) => {
     ws = null
   }
   if (e.target.matches(".btn-sign-up")) {
-    console.log("hola")
+
+    Notification.requestPermission().then((resultado) => {
+      console.log(`respuesta: `, resultado);
+    });
+
     let token = ""
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -825,6 +837,4 @@ document.addEventListener("click", async (e) => {
     console.log(idReceiver)
     document.getElementById(`input-chat-contact-${idReceiver}`).value = ""
   }
-
 });
-
